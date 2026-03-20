@@ -82,7 +82,7 @@ composeApp/src/commonMain/kotlin/.../myprofile/
 
 ---
 
-##  Komponen Reusable (State Hoisting)
+##  Komponen Reusable
 
 | Composable | File | Keterangan |
 |-----------|------|-----------|
@@ -121,4 +121,3 @@ composeApp/src/commonMain/kotlin/.../myprofile/
 
 ---
 
-*crafted with 🍵 & 🍓 · ITERA 2025*
