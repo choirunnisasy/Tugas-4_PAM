@@ -1,48 +1,127 @@
-This is a Kotlin Multiplatform project targeting Android, iOS, Desktop (JVM).
+# Pengembangan My Profile App — Tugas Minggu 4
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-    folder is the appropriate location.
-
-* [/iosApp](./iosApp/iosApp) contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform,
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
-
-### Build and Run Android Application
-
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:assembleDebug
-  ```
-
-### Build and Run Desktop (JVM) Application
-
-To build and run the development version of the desktop app, use the run configuration from the run widget
-in your IDE’s toolbar or run it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:run
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:run
-  ```
-
-### Build and Run iOS Application
-
-To build and run the development version of the iOS app, use the run configuration from the run widget
-in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and run it from there.
+> **IF25-22017 Pengembangan Aplikasi Mobile**  
+> Tugas 4: State Management dan MVVM  
+> Program Studi Teknik Informatika · Institut Teknologi Sumatera
 
 ---
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+## Identitas Mahasiswa
+
+| | |
+|---|---|
+| **Nama** | Choirunnisa Syawaldina |
+| **NIM** | 123140136 |
+| **Kelas** | Teknik Informatika |
+
+---
+
+##  Deskripsi Tugas
+
+Tugas ini merupakan pengembangan dari **Profile App (Tugas 3)** dengan menerapkan konsep **State Management** dan **MVVM Architecture Pattern** menggunakan Compose Multiplatform.
+
+Tiga fitur utama yang dikembangkan:
+
+**1. Implementasi MVVM Pattern**  
+Memisahkan UI dari logic menggunakan `ProfileViewModel` yang menyimpan dan mengelola `ProfileUiState` melalui `StateFlow`. View hanya membaca state dan mengirim event ke ViewModel — tidak ada logic di dalam composable.
+
+**2. Fitur Edit Profile**  
+User dapat mengedit nama, bio, email, nomor telepon, dan lokasi melalui form yang muncul dengan animasi slide. Setiap `TextField` bersifat stateless menggunakan pola **state hoisting** — nilai (`value`) dan callback (`onValueChange`) dikirim dari ViewModel, bukan disimpan di dalam komponen.
+
+**3. Fitur Dark Mode Toggle**  
+Switch di header profil untuk berpindah antara light mode dan dark mode. State `isDarkMode` disimpan di ViewModel sehingga tidak hilang saat terjadi konfigurasi ulang. Seluruh warna UI menyesuaikan secara otomatis saat mode diubah *(Bonus +10%)*.
+
+---
+
+##  Arsitektur MVVM
+
+```
+┌─────────────────────────────────────┐
+│           DATA LAYER                │
+│      ProfileUiState.kt              │
+│  (data class: name, bio, email...)  │
+└────────────────┬────────────────────┘
+                 │
+┌────────────────▼────────────────────┐
+│         VIEWMODEL LAYER             │
+│      ProfileViewModel.kt            │
+│  MutableStateFlow → StateFlow       │
+│  fun onNameChange(), saveProfile()  │
+│  fun toggleDarkMode(), enterEdit()  │
+└────────────────┬────────────────────┘
+                 │ collectAsState()
+┌────────────────▼────────────────────┐
+│            UI LAYER                 │
+│  App.kt → ProfileScreen             │
+│  ui/EditProfileScreen.kt            │
+│  ProfileComponent.kt                │
+└─────────────────────────────────────┘
+```
+
+**Alur State Hoisting di EditProfileScreen:**
+```
+ViewModel._uiState (MutableStateFlow)
+       ↓ uiState.name
+ProfileTextField(value = uiState.name, onValueChange = { viewModel.onNameChange(it) })
+       ↑ onNameChange(newValue)
+ViewModel._uiState.update { it.copy(name = newValue) }
+```
+
+---
+
+##  Struktur Folder
+
+```
+composeApp/src/commonMain/kotlin/.../myprofile/
+├── data/
+│   └── ProfileUiState.kt       ← Data class UI State
+├── viewmodel/
+│   └── ProfileViewModel.kt     ← ViewModel + StateFlow
+├── ui/
+│   └── EditProfileScreen.kt    ← Form edit profil
+├── App.kt                      ← Root + ProfileScreen
+└── ProfileComponent.kt         ← Reusable composables
+```
+
+---
+
+##  Komponen Reusable (State Hoisting)
+
+| Composable | File | Keterangan |
+|-----------|------|-----------|
+| `ProfileTextField` | EditProfileScreen.kt | Stateless — `value` + `onValueChange` dari ViewModel |
+| `FormSection` | EditProfileScreen.kt | Wrapper section form dengan judul |
+| `ReadOnlyField` | EditProfileScreen.kt | Field NIM & Jurusan (tidak bisa diedit) |
+| `EditTopBar` | EditProfileScreen.kt | Top bar dengan tombol Batal & Simpan |
+| `InfoCard` | ProfileComponent.kt | Card info kontak, reactive terhadap state |
+| `ProfileTag` | ProfileComponent.kt | Pill tag NIM dan jurusan |
+
+---
+
+##  Screenshot
+
+### Light Mode
+| Profile Screen | Edit Profile |
+|---|---|
+| ![Profile Light](screenshots/profile_light.png) | ![Edit Profile](screenshots/edit_profile.png) |
+
+### Dark Mode
+| Profile Screen | Edit Profile Dark |
+|---|---|
+| ![Profile Dark](screenshots/profile_dark.png) | ![Edit Dark](screenshots/edit_dark.png) |
+
+---
+
+
+## 🛠️ Tech Stack
+
+- **Language:** Kotlin
+- **UI:** Compose Multiplatform
+- **Architecture:** MVVM
+- **State:** `StateFlow` + `collectAsState()`
+- **Animation:** `AnimatedContent`, `AnimatedVisibility`
+- **Target:** Android
+
+---
+
+*crafted with 🍵 & 🍓 · ITERA 2025*
