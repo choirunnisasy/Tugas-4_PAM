@@ -1,217 +1,490 @@
 package id.ac.itera.choirunnisasy.myprofile
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.ui.layout.ContentScale
 import org.jetbrains.compose.resources.painterResource
 import myprofileapp.composeapp.generated.resources.Res
 import myprofileapp.composeapp.generated.resources.profile_nisa
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
-import androidx.compose.material.icons.rounded.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.rounded.DarkMode
+import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.Email
+import androidx.compose.material.icons.rounded.LightMode
+import androidx.compose.material.icons.rounded.LocationOn
+import androidx.compose.material.icons.rounded.Phone
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import id.ac.itera.choirunnisasy.myprofile.data.ProfileUiState
+import id.ac.itera.choirunnisasy.myprofile.ui.EditProfileScreen
+import id.ac.itera.choirunnisasy.myprofile.viewmodel.ProfileViewModel
 import kotlinx.coroutines.delay
 
-// ─── COLOR PALETTE ────────────────────────────────────────────────────────────
-private val matchaDeep      = Color(0xFF3D5229)
-private val matcha          = Color(0xFF5C7A3E)
-private val matchaLight     = Color(0xFFA8C57E)
-private val matchaPale      = Color(0xFFD4E8B8)
-private val strawberry      = Color(0xFFC0392B)
-private val strawberryPale  = Color(0xFFFDECEA)
-private val cream           = Color(0xFFFAF6F0)
-private val creamDark       = Color(0xFFF0E8DC)
-private val warmWhite       = Color(0xFFFFFDF9)
-private val charcoal        = Color(0xFF1A1A1A)
+// ─── COLORS ───────────────────────────────────────────────────────────────────
+private val matchaDeep     = Color(0xFF3D5229)
+private val matcha         = Color(0xFF5C7A3E)
+private val matchaLight    = Color(0xFFA8C57E)
+private val matchaPale     = Color(0xFFD4E8B8)
+private val strawberry     = Color(0xFFC0392B)
+private val strawberryPale = Color(0xFFFDECEA)
+private val cream          = Color(0xFFFAF6F0)
+private val creamDark      = Color(0xFFF0E8DC)
+private val warmWhite      = Color(0xFFFFFDF9)
+private val charcoal       = Color(0xFF1A1A1A)
+private val darkBg         = Color(0xFF1A1F14)
+private val darkSurface    = Color(0xFF252D1C)
+private val darkCard       = Color(0xFF2E3822)
+private val darkText       = Color(0xFFE8F0D8)
+private val darkSubtext    = Color(0xFFA8B898)
 
-// ─── ROOT COMPOSABLE ──────────────────────────────────────────────────────────
+// ─── ROOT ─────────────────────────────────────────────────────────────────────
 @Composable
 fun App() {
-    MaterialTheme {
-        var headerVisible  by remember { mutableStateOf(false) }
-        var contentVisible by remember { mutableStateOf(false) }
-        var cardsVisible   by remember { mutableStateOf(false) }
+    val viewModel: ProfileViewModel = viewModel()
+    val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-        LaunchedEffect(Unit) {
-            headerVisible  = true
-            delay(500)
-            contentVisible = true
-            delay(300)
-            cardsVisible   = true
+    LaunchedEffect(uiState.isSaved) {
+        if (uiState.isSaved) {
+            snackbarHostState.showSnackbar("Profil berhasil disimpan!")
+            viewModel.onSavedFeedbackShown()
         }
+    }
 
-        val infiniteTransition = rememberInfiniteTransition(label = "bg")
-        val bgAlpha by infiniteTransition.animateFloat(
-            initialValue  = 0.3f,
-            targetValue   = 0.6f,
-            animationSpec = infiniteRepeatable(
-                animation  = tween(4000, easing = LinearEasing),
-                repeatMode = RepeatMode.Reverse
-            ),
-            label = "bgPulse"
+    MaterialTheme(
+        colorScheme = MaterialTheme.colorScheme.copy(
+            background = Color.Transparent,
+            surface    = Color.Transparent
         )
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(cream, creamDark, Color(0xFFE8D8C8))
+    ) {
+        Scaffold(
+            contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0),
+            snackbarHost = {
+                SnackbarHost(hostState = snackbarHostState) { data ->
+                    Snackbar(
+                        snackbarData   = data,
+                        containerColor = matcha,
+                        contentColor   = Color.White,
+                        shape          = RoundedCornerShape(14.dp),
+                        modifier       = Modifier.padding(16.dp)
                     )
-                )
-        ) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                drawCircle(
-                    brush = Brush.radialGradient(
-                        colors = listOf(matchaPale.copy(alpha = bgAlpha * 0.8f), Color.Transparent),
-                        radius = 600f
-                    ),
-                    radius = 600f,
-                    center = Offset(size.width * 0.95f, -80f)
-                )
-                drawCircle(
-                    brush = Brush.radialGradient(
-                        colors = listOf(strawberryPale.copy(alpha = bgAlpha * 0.7f), Color.Transparent),
-                        radius = 400f
-                    ),
-                    radius = 400f,
-                    center = Offset(-60f, size.height * 0.85f)
-                )
-            }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-            ) {
-                // 1. Header
-                ProfileHeader(visible = headerVisible)
-
-                // 2. Name Card
-                NameCard(
-                    visible  = contentVisible,
-                    modifier = Modifier
-                        .padding(horizontal = 20.dp)
-                        .offset(y = (-52).dp)
-                )
-
-                // 3. Contact Info
-                Spacer(modifier = Modifier.height((-38).dp))
-
-                SectionTitle(                                          // ProfileComponent.kt
-                    title    = "Contact Information",
-                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 6.dp)
-                )
-
-                val infoList = listOf(
-                    Triple(Icons.Rounded.Email,      "Email Address",    "choirunnisa.123140136@student.itera.ac.id"),
-                    Triple(Icons.Rounded.Phone,      "Phone Number",     "+62 812 3456 7890"),
-                    Triple(Icons.Rounded.LocationOn, "Current Location", "Bandar Lampung, Indonesia")
-                )
-                val infoColors = listOf(
-                    Pair(matcha,             matchaPale),
-                    Pair(strawberry,         strawberryPale),
-                    Pair(Color(0xFFD4840A),  Color(0xFFFFF3E0))
-                )
-
-                infoList.forEachIndexed { index, (icon, label, value) ->
-                    AnimatedVisibility(
-                        visible = cardsVisible,
-                        enter   = fadeIn(tween(500, delayMillis = index * 150)) +
-                                slideInHorizontally(tween(500, delayMillis = index * 150)) { -60 }
-                    ) {
-                        InfoCard(                                       // ProfileComponent.kt
-                            icon        = icon,
-                            label       = label,
-                            value       = value,
-                            accentColor = infoColors[index].first,
-                            bgColor     = infoColors[index].second,
-                            modifier    = Modifier.padding(horizontal = 20.dp)
+                }
+            },
+            containerColor = Color.Transparent
+        ) { paddingValues ->
+            Box(modifier = Modifier.padding(paddingValues)) {
+                AnimatedContent(
+                    targetState = uiState.isEditMode,
+                    transitionSpec = {
+                        if (targetState) {
+                            (slideInHorizontally(tween(400)) { it } + fadeIn(tween(400)))
+                                .togetherWith(slideOutHorizontally(tween(400)) { -it } + fadeOut(tween(400)))
+                        } else {
+                            (slideInHorizontally(tween(400)) { -it } + fadeIn(tween(400)))
+                                .togetherWith(slideOutHorizontally(tween(400)) { it } + fadeOut(tween(400)))
+                        }
+                    },
+                    label = "screenTransition"
+                ) { isEditing ->
+                    if (isEditing) {
+                        EditProfileScreen(
+                            uiState          = uiState,
+                            onNameChange     = { viewModel.onNameChange(it) },
+                            onBioChange      = { viewModel.onBioChange(it) },
+                            onEmailChange    = { viewModel.onEmailChange(it) },
+                            onPhoneChange    = { viewModel.onPhoneChange(it) },
+                            onLocationChange = { viewModel.onLocationChange(it) },
+                            onSave           = { viewModel.saveProfile() },
+                            onCancel         = { viewModel.cancelEdit() }
+                        )
+                    } else {
+                        ProfileScreen(
+                            uiState      = uiState,
+                            onEditClick  = { viewModel.enterEditMode() },
+                            onToggleDark = { viewModel.toggleDarkMode() }
                         )
                     }
                 }
+            }
+        }
+    }
+}
 
-                // 4. Skills
-                Spacer(modifier = Modifier.height(16.dp))
+// ─── PROFILE SCREEN ───────────────────────────────────────────────────────────
+@Composable
+fun ProfileScreen(
+    uiState      : ProfileUiState,
+    onEditClick  : () -> Unit,
+    onToggleDark : () -> Unit
+) {
+    val isDark = uiState.isDarkMode
 
-                SectionTitle(                                          // ProfileComponent.kt
-                    title      = "Skills & Interests",
-                    modifier   = Modifier.padding(horizontal = 24.dp, vertical = 6.dp),
-                    isReversed = true
+    var headerVisible  by remember { mutableStateOf(false) }
+    var contentVisible by remember { mutableStateOf(false) }
+    var cardsVisible   by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        headerVisible  = true
+        delay(400)
+        contentVisible = true
+        delay(250)
+        cardsVisible   = true
+    }
+
+    val bgColors = if (isDark) {
+        listOf(darkBg, darkSurface, Color(0xFF1E2818))
+    } else {
+        listOf(cream, creamDark, Color(0xFFE8D8C8))
+    }
+
+    val infiniteTransition = rememberInfiniteTransition(label = "bg")
+    val bgAlpha by infiniteTransition.animateFloat(
+        initialValue  = 0.3f,
+        targetValue   = 0.6f,
+        animationSpec = infiniteRepeatable(
+            animation  = tween(4000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "bgPulse"
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Brush.verticalGradient(colors = bgColors))
+    ) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            drawCircle(
+                brush  = Brush.radialGradient(
+                    colors = listOf(matchaPale.copy(alpha = bgAlpha * 0.8f), Color.Transparent),
+                    radius = 600f
+                ),
+                radius = 600f,
+                center = Offset(size.width * 0.95f, -80f)
+            )
+            drawCircle(
+                brush  = Brush.radialGradient(
+                    colors = listOf(strawberryPale.copy(alpha = bgAlpha * 0.7f), Color.Transparent),
+                    radius = 400f
+                ),
+                radius = 400f,
+                center = Offset(-60f, size.height * 0.85f)
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
+            // 1. Header
+            ProfileHeaderWithToggle(
+                visible      = headerVisible,
+                isDark       = isDark,
+                onToggleDark = onToggleDark
+            )
+
+            // 2. Name Card
+            NameCard(
+                visible  = contentVisible,
+                uiState  = uiState,
+                isDark   = isDark,
+                modifier = Modifier
+                    .padding(horizontal = 20.dp)
+                    .offset(y = (-52).dp)
+            )
+
+            // 3. Contact Info
+            Spacer(modifier = Modifier.height((-38).dp))
+
+            SectionTitleDark(
+                title    = "Contact Information",
+                isDark   = isDark,
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 6.dp)
+            )
+
+            // InfoCard
+            AnimatedVisibility(
+                visible = cardsVisible,
+                enter   = fadeIn(tween(500)) + slideInHorizontally(tween(500)) { -60 }
+            ) {
+                InfoCard(
+                    icon        = Icons.Rounded.Email,
+                    label       = "Email Address",
+                    value       = uiState.email,
+                    accentColor = matcha,
+                    bgColor     = matchaPale,
+                    modifier    = Modifier.padding(horizontal = 20.dp)
                 )
+            }
 
-                AnimatedVisibility(
-                    visible = cardsVisible,
-                    enter   = fadeIn(tween(600, delayMillis = 500)) +
-                            slideInVertically(tween(600, delayMillis = 500)) { 40 }
-                ) {
-                    SkillsSection(
-                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
-                    )
-                }
+            AnimatedVisibility(
+                visible = cardsVisible,
+                enter   = fadeIn(tween(500, delayMillis = 150)) +
+                        slideInHorizontally(tween(500, delayMillis = 150)) { -60 }
+            ) {
+                InfoCard(
+                    icon        = Icons.Rounded.Phone,
+                    label       = "Phone Number",
+                    value       = uiState.phone,
+                    accentColor = strawberry,
+                    bgColor     = strawberryPale,
+                    modifier    = Modifier.padding(horizontal = 20.dp)
+                )
+            }
 
-                // 5. Button
-                Spacer(modifier = Modifier.height(20.dp))
+            AnimatedVisibility(
+                visible = cardsVisible,
+                enter   = fadeIn(tween(500, delayMillis = 300)) +
+                        slideInHorizontally(tween(500, delayMillis = 300)) { -60 }
+            ) {
+                InfoCard(
+                    icon        = Icons.Rounded.LocationOn,
+                    label       = "Current Location",
+                    value       = uiState.location,
+                    accentColor = Color(0xFFD4840A),
+                    bgColor     = Color(0xFFFFF3E0),
+                    modifier    = Modifier.padding(horizontal = 20.dp)
+                )
+            }
 
-                AnimatedVisibility(
-                    visible = cardsVisible,
-                    enter   = fadeIn(tween(600, delayMillis = 700)) +
-                            slideInVertically(tween(600, delayMillis = 700)) { 50 }
-                ) {
-                    ContactButton(
-                        modifier = Modifier
-                            .padding(horizontal = 20.dp)
-                            .fillMaxWidth()
-                    )
-                }
+            // 4. Skills
+            Spacer(modifier = Modifier.height(16.dp))
 
-                // 6. Footer
-                FooterNote(                                            // ProfileComponent.kt
+            SectionTitleDark(
+                title      = "Skills & Interests",
+                isDark     = isDark,
+                modifier   = Modifier.padding(horizontal = 24.dp, vertical = 6.dp),
+                isReversed = true
+            )
+
+            AnimatedVisibility(
+                visible = cardsVisible,
+                enter   = fadeIn(tween(600, delayMillis = 500)) +
+                        slideInVertically(tween(600, delayMillis = 500)) { 40 }
+            ) {
+                SkillsSectionDark(
+                    isDark   = isDark,
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // 5. Edit Profile Button
+            AnimatedVisibility(
+                visible = cardsVisible,
+                enter   = fadeIn(tween(600, delayMillis = 600)) +
+                        slideInVertically(tween(600, delayMillis = 600)) { 50 }
+            ) {
+                OutlinedButton(
+                    onClick  = onEditClick,
                     modifier = Modifier
+                        .padding(horizontal = 20.dp)
                         .fillMaxWidth()
-                        .padding(vertical = 28.dp)
+                        .height(56.dp),
+                    shape  = RoundedCornerShape(18.dp),
+                    border = BorderStroke(
+                        width = 2.dp,
+                        color = matchaLight.copy(alpha = if (isDark) 0.5f else 0.8f)
+                    ),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = if (isDark) matchaLight else matchaDeep
+                    )
+                ) {
+                    androidx.compose.material3.Icon(
+                        imageVector     = Icons.Rounded.Edit,
+                        contentDescription = null,
+                        modifier        = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text       = "Edit Profil",
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize   = 15.sp
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // 6. Contact Button
+            AnimatedVisibility(
+                visible = cardsVisible,
+                enter   = fadeIn(tween(600, delayMillis = 700)) +
+                        slideInVertically(tween(600, delayMillis = 700)) { 50 }
+            ) {
+                Button(
+                    onClick        = { },
+                    modifier       = Modifier
+                        .padding(horizontal = 20.dp)
+                        .fillMaxWidth()
+                        .height(60.dp),
+                    shape          = RoundedCornerShape(22.dp),
+                    colors         = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                    contentPadding = PaddingValues(0.dp),
+                    elevation      = ButtonDefaults.buttonElevation(defaultElevation = 10.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(strawberry, Color(0xFFA93226), strawberry)
+                                ),
+                                shape = RoundedCornerShape(22.dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(
+                            verticalAlignment     = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            Text(text = "🍓", fontSize = 16.sp)
+                            Text(
+                                text       = "Contact Me",
+                                fontSize   = 17.sp,
+                                fontWeight = FontWeight.Bold,
+                                color      = Color.White
+                            )
+                            androidx.compose.material3.Icon(
+                                imageVector     = Icons.AutoMirrored.Rounded.ArrowForward,
+                                contentDescription = null,
+                                tint            = Color.White.copy(alpha = 0.8f),
+                                modifier        = Modifier.size(18.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Footer
+            Column(
+                modifier            = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 28.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier        = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(0.4f)
+                            .height(1.dp)
+                            .background(
+                                Brush.horizontalGradient(
+                                    colors = listOf(
+                                        Color.Transparent,
+                                        matchaLight.copy(alpha = 0.5f),
+                                        Color.Transparent
+                                    )
+                                )
+                            )
+                    )
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text      = "crafted with 🍵 & 🍓 · ITERA 2025",
+                    fontSize  = 11.sp,
+                    color     = if (isDark) darkSubtext else Color(0xFF999999),
+                    fontStyle = FontStyle.Italic
                 )
             }
         }
     }
 }
 
-// ─── ProfileHeader ────────────────────────────────────────────────────────────
+// ─── ProfileHeaderWithToggle ──────────────────────────────────────────────────
 @Composable
-private fun ProfileHeader(visible: Boolean) {
+private fun ProfileHeaderWithToggle(
+    visible      : Boolean,
+    isDark       : Boolean,
+    onToggleDark : () -> Unit
+) {
+    val headerColors = if (isDark) {
+        listOf(Color(0xFF1E2D14), Color(0xFF2E4020), Color(0xFF3D5229))
+    } else {
+        listOf(matchaDeep, matcha, matchaLight)
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(320.dp)
+            .height(360.dp)
             .clip(RoundedCornerShape(bottomStart = 56.dp, bottomEnd = 56.dp))
             .background(
                 Brush.linearGradient(
-                    colors = listOf(matchaDeep, matcha, matchaLight),
+                    colors = headerColors,
                     start  = Offset(0f, 0f),
                     end    = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
                 )
@@ -219,20 +492,57 @@ private fun ProfileHeader(visible: Boolean) {
         contentAlignment = Alignment.Center
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
-            drawCircle(color = Color.White.copy(alpha = 0.07f), radius = 180f,
-                center = Offset(size.width - 30f, -40f))
-            drawCircle(color = Color.White.copy(alpha = 0.05f), radius = 100f,
-                center = Offset(40f, size.height - 30f))
+            drawCircle(
+                color  = Color.White.copy(alpha = 0.07f),
+                radius = 180f,
+                center = Offset(size.width - 30f, -40f)
+            )
+            drawCircle(
+                color  = Color.White.copy(alpha = 0.05f),
+                radius = 100f,
+                center = Offset(40f, size.height - 30f)
+            )
             listOf(
                 Offset(size.width * 0.15f, size.height * 0.25f),
                 Offset(size.width * 0.85f, size.height * 0.65f),
                 Offset(size.width * 0.70f, size.height * 0.15f),
                 Offset(size.width * 0.25f, size.height * 0.75f),
-            ).forEach { drawCircle(color = Color.White.copy(alpha = 0.2f), radius = 4f, center = it) }
+            ).forEach {
+                drawCircle(color = Color.White.copy(alpha = 0.2f), radius = 4f, center = it)
+            }
         }
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Spacer(modifier = Modifier.height(48.dp))
+            // Padding untuk status bar
+            Spacer(modifier = Modifier.height(40.dp))
+
+            // Dark Mode Toggle — state di ViewModel
+            Row(
+                modifier              = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment     = Alignment.CenterVertically
+            ) {
+                androidx.compose.material3.Icon(
+                    imageVector     = if (isDark) Icons.Rounded.DarkMode else Icons.Rounded.LightMode,
+                    contentDescription = "Toggle dark mode",
+                    tint            = Color.White.copy(alpha = 0.8f),
+                    modifier        = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Switch(
+                    checked         = isDark,
+                    onCheckedChange = { onToggleDark() },
+                    colors          = SwitchDefaults.colors(
+                        checkedThumbColor   = matchaDeep,
+                        checkedTrackColor   = matchaLight,
+                        uncheckedThumbColor = Color.White,
+                        uncheckedTrackColor = Color.White.copy(alpha = 0.3f)
+                    )
+                )
+            }
+
             AnimatedVisibility(
                 visible = visible,
                 enter   = fadeIn(tween(800)) + scaleIn(tween(800), initialScale = 0.5f)
@@ -250,16 +560,21 @@ private fun ProfilePhotoWidget() {
     val rotation by infiniteTransition.animateFloat(
         initialValue  = 0f,
         targetValue   = 360f,
-        animationSpec = infiniteRepeatable(tween(12000, easing = LinearEasing)),
-        label         = "rotate"
+        animationSpec = infiniteRepeatable(
+            animation = tween(12000, easing = LinearEasing)
+        ),
+        label = "rotate"
     )
 
-    Box(contentAlignment = Alignment.Center, modifier = Modifier.size(160.dp)) {
+    Box(
+        modifier         = Modifier.size(160.dp),
+        contentAlignment = Alignment.Center
+    ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             drawCircle(
                 color  = Color.White.copy(alpha = 0.35f),
                 radius = size.minDimension / 2,
-                style  = androidx.compose.ui.graphics.drawscope.Stroke(
+                style  = Stroke(
                     width      = 2f,
                     pathEffect = PathEffect.dashPathEffect(floatArrayOf(12f, 8f), phase = rotation)
                 )
@@ -270,11 +585,13 @@ private fun ProfilePhotoWidget() {
             modifier = Modifier
                 .size(138.dp)
                 .clip(CircleShape)
-                .border(4.dp, Color.White, CircleShape)
-                .border(7.dp, strawberry, CircleShape)
+                .border(width = 4.dp, color = Color.White, shape = CircleShape)
+                .border(width = 7.dp, color = strawberry, shape = CircleShape)
                 .padding(6.dp)
                 .clip(CircleShape)
-                .background(Brush.linearGradient(colors = listOf(matchaLight, matchaDeep))),
+                .background(
+                    Brush.linearGradient(colors = listOf(matchaLight, matchaDeep))
+                ),
             contentAlignment = Alignment.Center
         ) {
             Image(
@@ -292,7 +609,7 @@ private fun ProfilePhotoWidget() {
                 .offset(x = 4.dp, y = (-4).dp)
                 .clip(CircleShape)
                 .background(strawberry)
-                .border(2.dp, Color.White, CircleShape),
+                .border(width = 2.dp, color = Color.White, shape = CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Text(text = "🍓", fontSize = 14.sp)
@@ -302,7 +619,15 @@ private fun ProfilePhotoWidget() {
 
 // ─── NameCard ─────────────────────────────────────────────────────────────────
 @Composable
-private fun NameCard(visible: Boolean, modifier: Modifier = Modifier) {
+private fun NameCard(
+    visible  : Boolean,
+    uiState  : ProfileUiState,
+    isDark   : Boolean,
+    modifier : Modifier = Modifier
+) {
+    val cardColor = if (isDark) darkCard else warmWhite
+    val textColor = if (isDark) darkText else charcoal
+
     AnimatedVisibility(
         visible = visible,
         enter   = fadeIn(tween(700)) + slideInVertically(tween(700)) { 50 }
@@ -310,16 +635,22 @@ private fun NameCard(visible: Boolean, modifier: Modifier = Modifier) {
         Card(
             modifier  = modifier.fillMaxWidth(),
             shape     = RoundedCornerShape(28.dp),
-            colors    = CardDefaults.cardColors(containerColor = warmWhite),
+            colors    = CardDefaults.cardColors(containerColor = cardColor),
             elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
-            border    = BorderStroke(1.5.dp, matchaLight.copy(alpha = 0.3f))
+            border    = BorderStroke(
+                width = 1.5.dp,
+                color = matchaLight.copy(alpha = if (isDark) 0.2f else 0.3f)
+            )
         ) {
+            // Accent bar
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(4.dp)
                     .background(
-                        Brush.horizontalGradient(colors = listOf(matchaLight, strawberry, matchaLight))
+                        Brush.horizontalGradient(
+                            colors = listOf(matchaLight, strawberry, matchaLight)
+                        )
                     )
             )
             Column(
@@ -328,97 +659,107 @@ private fun NameCard(visible: Boolean, modifier: Modifier = Modifier) {
                     .padding(horizontal = 24.dp, vertical = 22.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Choirunnisa", fontSize = 26.sp, fontWeight = FontWeight.Black,
-                    color = charcoal, letterSpacing = 0.3.sp)
-                Text("Syawaldina",  fontSize = 22.sp, fontWeight = FontWeight.Bold,
-                    fontStyle = FontStyle.Italic, color = matchaDeep, letterSpacing = 0.3.sp)
-
-                Spacer(modifier = Modifier.height(10.dp))
-
+                val nameParts = uiState.name.trim().split(" ")
                 Text(
-                    text       = "\"Where the calm of matcha meets\nthe sweetness of strawberry\"",
+                    text       = nameParts.firstOrNull() ?: uiState.name,
+                    fontSize   = 26.sp,
+                    fontWeight = FontWeight.Black,
+                    color      = textColor
+                )
+                if (nameParts.size > 1) {
+                    Text(
+                        text       = nameParts.drop(1).joinToString(" "),
+                        fontSize   = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontStyle  = FontStyle.Italic,
+                        color      = if (isDark) matchaLight else matchaDeep
+                    )
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text       = "\"${uiState.bio}\"",
                     fontSize   = 13.sp,
-                    color      = strawberry,
+                    color      = if (isDark) darkSubtext else strawberry,
                     fontStyle  = FontStyle.Italic,
                     fontWeight = FontWeight.Medium,
                     textAlign  = TextAlign.Center,
                     lineHeight = 20.sp
                 )
-
                 Spacer(modifier = Modifier.height(16.dp))
-
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    ProfileTag(emoji = "🌿", text = "123140136",          isMatcha = true)   // ProfileComponent.kt
-                    ProfileTag(emoji = "💻", text = "Teknik Informatika", isMatcha = false)  // ProfileComponent.kt
+                    ProfileTag(emoji = "🌿", text = uiState.nim,     isMatcha = true)
+                    ProfileTag(emoji = "💻", text = uiState.jurusan, isMatcha = false)
                 }
             }
         }
     }
 }
 
-// ─── SkillsSection ────────────────────────────────────────────────────────────
+// ─── SectionTitleDark ─────────────────────────────────────────────────────────
 @Composable
-private fun SkillsSection(modifier: Modifier = Modifier) {
+private fun SectionTitleDark(
+    title      : String,
+    isDark     : Boolean,
+    modifier   : Modifier = Modifier,
+    isReversed : Boolean  = false
+) {
+    Row(
+        modifier              = modifier,
+        verticalAlignment     = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .width(4.dp)
+                .height(22.dp)
+                .clip(RoundedCornerShape(4.dp))
+                .background(
+                    Brush.verticalGradient(
+                        colors = if (isReversed) listOf(strawberry, matcha)
+                        else             listOf(matcha, strawberry)
+                    )
+                )
+        )
+        Text(
+            text       = title,
+            fontSize   = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color      = if (isDark) darkText else charcoal
+        )
+    }
+}
+
+// ─── SkillsSectionDark ────────────────────────────────────────────────────────
+@Composable
+private fun SkillsSectionDark(isDark: Boolean, modifier: Modifier = Modifier) {
     val skills = listOf(
-        Triple("🍵", "Compose UI", true),
-        Triple("🍓", "Kotlin",     false),
-        Triple("🌿", "Mobile Dev", true),
-        Triple("☕", "Clean Code", false),
-        Triple("🎨", "UI Design",  true),
-        Triple("📱", "Android",    false),
+        Triple("🍵", "Compose UI",  true),
+        Triple("🍓", "Kotlin",      false),
+        Triple("🌿", "Mobile Dev",  true),
+        Triple("☕", "Clean Code",  false),
+        Triple("🎨", "UI Design",   true),
+        Triple("📱", "Android",     false),
     )
 
     Card(
         modifier  = modifier.fillMaxWidth(),
         shape     = RoundedCornerShape(20.dp),
-        colors    = CardDefaults.cardColors(containerColor = warmWhite.copy(alpha = 0.9f)),
+        colors    = CardDefaults.cardColors(
+            containerColor = if (isDark) darkCard else warmWhite.copy(alpha = 0.9f)
+        ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 skills.take(3).forEach { (e, l, m) ->
-                    SkillChip(emoji = e, label = l, isMatcha = m)     // ProfileComponent.kt
+                    SkillChip(emoji = e, label = l, isMatcha = m)
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 skills.drop(3).forEach { (e, l, m) ->
-                    SkillChip(emoji = e, label = l, isMatcha = m)     // ProfileComponent.kt
+                    SkillChip(emoji = e, label = l, isMatcha = m)
                 }
-            }
-        }
-    }
-}
-
-// ─── ContactButton ────────────────────────────────────────────────────────────
-@Composable
-private fun ContactButton(modifier: Modifier = Modifier) {
-    Button(
-        onClick        = { /* TODO */ },
-        modifier       = modifier.height(60.dp),
-        shape          = RoundedCornerShape(22.dp),
-        colors         = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-        contentPadding = PaddingValues(0.dp),
-        elevation      = ButtonDefaults.buttonElevation(defaultElevation = 10.dp, pressedElevation = 4.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.linearGradient(colors = listOf(strawberry, Color(0xFFA93226), strawberry)),
-                    shape = RoundedCornerShape(22.dp)
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Row(
-                verticalAlignment     = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                Text("🍓", fontSize = 16.sp)
-                Text("Contact Me", fontSize = 17.sp, fontWeight = FontWeight.Bold,
-                    color = Color.White, letterSpacing = 0.4.sp)
-                Icon(Icons.AutoMirrored.Rounded.ArrowForward, contentDescription = null,
-                    tint = Color.White.copy(alpha = 0.8f), modifier = Modifier.size(18.dp))
             }
         }
     }
