@@ -95,18 +95,18 @@ composeApp/src/commonMain/kotlin/.../myprofile/
 
 ---
 
-##  Screenshot
-
+## Screenshot
+ 
 ### Light Mode
 | Profile Screen | Edit Profile |
 |---|---|
-| ![Profile Light](screenshots/profile_light.png) | ![Edit Profile](screenshots/edit_profile.png) |
-
+| ![Profile Light](screenshots/Screenshot_20260320_203940.png) | ![Edit Profile](screenshots/Screenshot_20260320_204132.png) |
+ 
 ### Dark Mode
 | Profile Screen | Edit Profile Dark |
 |---|---|
-| ![Profile Dark](screenshots/profile_dark.png) | ![Edit Dark](screenshots/edit_dark.png) |
-
+| ![Profile Dark](screenshots/Screenshot_20260320_204051.png) | ![Edit Dark](screenshots/Screenshot_20260320_211200.png) |
+ 
 ---
 
 
