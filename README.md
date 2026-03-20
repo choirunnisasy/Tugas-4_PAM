@@ -7,12 +7,9 @@
 ---
 
 ## Identitas Mahasiswa
-
-| | |
-|---|---|
-| **Nama** | Choirunnisa Syawaldina |
-| **NIM** | 123140136 |
-| **Kelas** | Teknik Informatika |
+- **Nama**: Choirunnisa Syawaldina
+- **NIM**: 123140136
+- **Mata Kuliah**: Pengembangan Aplikasi Mobile RB
 
 ---
 
