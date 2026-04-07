@@ -1,10 +1,8 @@
 # Tugas Praktikum Minggu 5 - Navigasi Antar Layar
 
-**Nama:** Choirunnisa
-
-**NIM:** 123140136
-
-**Mata Kuliah:** Pengembangan Aplikasi Mobile RB
+-**Nama:** Choirunnisa
+-**NIM:** 123140136
+-**Mata Kuliah:** Pengembangan Aplikasi Mobile RB
 
 ##  Deskripsi Tugas
 Project ini merupakan pengembangan dari Notes App sebelumnya dengan penambahan fitur navigasi multi-screen menggunakan Compose Multiplatform sesuai dengan modul pertemuan 5.
