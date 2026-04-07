@@ -1,4 +1,4 @@
-package id.ac.itera.choirunnisasy.myprofile
+package id.ac.itera.choirunnisasy.myprofile.component
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*

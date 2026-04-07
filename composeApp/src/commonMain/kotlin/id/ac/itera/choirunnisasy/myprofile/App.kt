@@ -1,6 +1,5 @@
 package id.ac.itera.choirunnisasy.myprofile
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -9,12 +8,9 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.ui.layout.ContentScale
 import org.jetbrains.compose.resources.painterResource
@@ -53,18 +49,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -82,10 +72,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import id.ac.itera.choirunnisasy.myprofile.component.InfoCard
+import id.ac.itera.choirunnisasy.myprofile.component.ProfileTag
+import id.ac.itera.choirunnisasy.myprofile.component.SkillChip
+import id.ac.itera.choirunnisasy.myprofile.navigation.AppNavigation
 import id.ac.itera.choirunnisasy.myprofile.data.ProfileUiState
-import id.ac.itera.choirunnisasy.myprofile.ui.EditProfileScreen
-import id.ac.itera.choirunnisasy.myprofile.viewmodel.ProfileViewModel
 import kotlinx.coroutines.delay
 
 // ─── COLORS ───────────────────────────────────────────────────────────────────
@@ -108,74 +99,7 @@ private val darkSubtext    = Color(0xFFA8B898)
 // ─── ROOT ─────────────────────────────────────────────────────────────────────
 @Composable
 fun App() {
-    val viewModel: ProfileViewModel = viewModel()
-    val uiState by viewModel.uiState.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    LaunchedEffect(uiState.isSaved) {
-        if (uiState.isSaved) {
-            snackbarHostState.showSnackbar("Profil berhasil disimpan!")
-            viewModel.onSavedFeedbackShown()
-        }
-    }
-
-    MaterialTheme(
-        colorScheme = MaterialTheme.colorScheme.copy(
-            background = Color.Transparent,
-            surface    = Color.Transparent
-        )
-    ) {
-        Scaffold(
-            contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0),
-            snackbarHost = {
-                SnackbarHost(hostState = snackbarHostState) { data ->
-                    Snackbar(
-                        snackbarData   = data,
-                        containerColor = matcha,
-                        contentColor   = Color.White,
-                        shape          = RoundedCornerShape(14.dp),
-                        modifier       = Modifier.padding(16.dp)
-                    )
-                }
-            },
-            containerColor = Color.Transparent
-        ) { paddingValues ->
-            Box(modifier = Modifier.padding(paddingValues)) {
-                AnimatedContent(
-                    targetState = uiState.isEditMode,
-                    transitionSpec = {
-                        if (targetState) {
-                            (slideInHorizontally(tween(400)) { it } + fadeIn(tween(400)))
-                                .togetherWith(slideOutHorizontally(tween(400)) { -it } + fadeOut(tween(400)))
-                        } else {
-                            (slideInHorizontally(tween(400)) { -it } + fadeIn(tween(400)))
-                                .togetherWith(slideOutHorizontally(tween(400)) { it } + fadeOut(tween(400)))
-                        }
-                    },
-                    label = "screenTransition"
-                ) { isEditing ->
-                    if (isEditing) {
-                        EditProfileScreen(
-                            uiState          = uiState,
-                            onNameChange     = { viewModel.onNameChange(it) },
-                            onBioChange      = { viewModel.onBioChange(it) },
-                            onEmailChange    = { viewModel.onEmailChange(it) },
-                            onPhoneChange    = { viewModel.onPhoneChange(it) },
-                            onLocationChange = { viewModel.onLocationChange(it) },
-                            onSave           = { viewModel.saveProfile() },
-                            onCancel         = { viewModel.cancelEdit() }
-                        )
-                    } else {
-                        ProfileScreen(
-                            uiState      = uiState,
-                            onEditClick  = { viewModel.enterEditMode() },
-                            onToggleDark = { viewModel.toggleDarkMode() }
-                        )
-                    }
-                }
-            }
-        }
-    }
+    AppNavigation()
 }
 
 // ─── PROFILE SCREEN ───────────────────────────────────────────────────────────
@@ -277,12 +201,12 @@ fun ProfileScreen(
                 enter   = fadeIn(tween(500)) + slideInHorizontally(tween(500)) { -60 }
             ) {
                 InfoCard(
-                    icon        = Icons.Rounded.Email,
-                    label       = "Email Address",
-                    value       = uiState.email,
+                    icon = Icons.Rounded.Email,
+                    label = "Email Address",
+                    value = uiState.email,
                     accentColor = matcha,
-                    bgColor     = matchaPale,
-                    modifier    = Modifier.padding(horizontal = 20.dp)
+                    bgColor = matchaPale,
+                    modifier = Modifier.padding(horizontal = 20.dp)
                 )
             }
 
@@ -292,12 +216,12 @@ fun ProfileScreen(
                         slideInHorizontally(tween(500, delayMillis = 150)) { -60 }
             ) {
                 InfoCard(
-                    icon        = Icons.Rounded.Phone,
-                    label       = "Phone Number",
-                    value       = uiState.phone,
+                    icon = Icons.Rounded.Phone,
+                    label = "Phone Number",
+                    value = uiState.phone,
                     accentColor = strawberry,
-                    bgColor     = strawberryPale,
-                    modifier    = Modifier.padding(horizontal = 20.dp)
+                    bgColor = strawberryPale,
+                    modifier = Modifier.padding(horizontal = 20.dp)
                 )
             }
 
@@ -307,12 +231,12 @@ fun ProfileScreen(
                         slideInHorizontally(tween(500, delayMillis = 300)) { -60 }
             ) {
                 InfoCard(
-                    icon        = Icons.Rounded.LocationOn,
-                    label       = "Current Location",
-                    value       = uiState.location,
+                    icon = Icons.Rounded.LocationOn,
+                    label = "Current Location",
+                    value = uiState.location,
                     accentColor = Color(0xFFD4840A),
-                    bgColor     = Color(0xFFFFF3E0),
-                    modifier    = Modifier.padding(horizontal = 20.dp)
+                    bgColor = Color(0xFFFFF3E0),
+                    modifier = Modifier.padding(horizontal = 20.dp)
                 )
             }
 
@@ -687,7 +611,7 @@ private fun NameCard(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    ProfileTag(emoji = "🌿", text = uiState.nim,     isMatcha = true)
+                    ProfileTag(emoji = "🌿", text = uiState.nim, isMatcha = true)
                     ProfileTag(emoji = "💻", text = uiState.jurusan, isMatcha = false)
                 }
             }
