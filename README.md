@@ -1,4 +1,4 @@
-# Pengembangan My Profile App — Tugas Minggu 4
+# Pengembangan Aplikasi Mobile
 
 > **IF25-22017 Pengembangan Aplikasi Mobile**  
 > Tugas 4: State Management dan MVVM  
