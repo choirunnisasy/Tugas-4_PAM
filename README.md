@@ -20,11 +20,11 @@ Project ini merupakan pengembangan dari Notes App sebelumnya dengan penambahan f
 
 | Notes List | Favorites | Profile |
 |:---:|:---:|:---:|
-| ![Notes List](Screenshot_20260417_121249) | ![Favorites](link_gambar_favorites) | ![Profile](link_gambar_profile) |
+| ![Notes List](screenshots/Screenshot_20260417_121249) | ![Favorites](screenshots/Screenshot_20260417_121327) | ![Profile](screenshots/Screenshot_20260417_121342) |
 
 | Add Note | Note Detail | Edit Note |
 |:---:|:---:|:---:|
-| ![Add Note](link_gambar_add_note) | ![Note Detail](link_gambar_note_detail) | ![Edit Note](link_gambar_edit_note) |
+| ![Add Note](screenshots/Screenshot_20260417_121401) | ![Note Detail](screenshots/Screenshot_20260417_121430) | ![Edit Note](screenshots/Screenshot_20260417_121440) |
 
 ## 🗺️ Navigation Flow Diagram
 ![Navigation Flow](link_gambar_diagram_flow)
