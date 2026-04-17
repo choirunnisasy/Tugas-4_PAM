@@ -16,7 +16,6 @@ Project ini merupakan pengembangan dari Notes App sebelumnya dengan penambahan f
 - [x] Struktur folder telah disesuaikan (`navigation/`, `screens/`, `components/`).
 
 ##  Screenshots Layar
-*(Tambahkan screenshot untuk masing-masing layar di bawah ini)*
 
 | Notes List | Favorites | Profile |
 |:---:|:---:|:---:|
