@@ -20,7 +20,7 @@ Project ini merupakan pengembangan dari Notes App sebelumnya dengan penambahan f
 
 | Notes List | Favorites | Profile |
 |:---:|:---:|:---:|
-| ![Notes List](link_gambar_notes_list) | ![Favorites](link_gambar_favorites) | ![Profile](link_gambar_profile) |
+| ![Notes List](Screenshot_20260417_121249) | ![Favorites](link_gambar_favorites) | ![Profile](link_gambar_profile) |
 
 | Add Note | Note Detail | Edit Note |
 |:---:|:---:|:---:|
