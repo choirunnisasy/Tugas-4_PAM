@@ -31,4 +31,4 @@ Project ini merupakan pengembangan dari Notes App sebelumnya dengan penambahan f
 
 ## 🎥 Video Demo (30 Detik)
 Video demonstrasi yang menunjukkan semua alur navigasi dapat dilihat pada tautan berikut:
-**[Tonton Video Demo di sini](link_video_youtube_atau_drive)**
+**[Tonton Video Demo di sini](https://drive.google.com/file/d/1UnAs8fvI0VvetaU7oNxArBhuxyv76ckN/view?usp=sharing)**
