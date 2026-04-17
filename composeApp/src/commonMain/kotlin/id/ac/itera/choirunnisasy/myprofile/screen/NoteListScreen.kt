@@ -54,6 +54,7 @@ fun NoteListScreen(
 
     Scaffold(
         containerColor = bgColor,
+        contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0),
         floatingActionButton = {
             // FAB untuk Add Note
             FloatingActionButton(
@@ -86,6 +87,7 @@ fun NoteListScreen(
                                 listOf(matchaDeep, matcha)
                         )
                     )
+                    .statusBarsPadding()
                     .padding(horizontal = 20.dp, vertical = 24.dp)
             ) {
                 Column {

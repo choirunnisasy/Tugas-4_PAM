@@ -73,6 +73,7 @@ fun FavoritesScreen(
                             )
                         )
                     )
+                    .statusBarsPadding()
                     .padding(horizontal = 20.dp, vertical = 24.dp)
             ) {
                 Column {
