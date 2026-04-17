@@ -27,7 +27,39 @@ Project ini merupakan pengembangan dari Notes App sebelumnya dengan penambahan f
 | ![Add Note](screenshots/Screenshot_20260417_121401.png) | ![Note Detail](screenshots/Screenshot_20260417_121430.png) | ![Edit Note](screenshots/Screenshot_20260417_121440.png) |
 
 ## 🗺️ Navigation Flow Diagram
-![Navigation Flow](link_gambar_diagram_flow)
+![Navigation Flow]
+```mermaid
+flowchart TD
+    %% Tabs Navigation
+    T_Notes[Notes Tab]
+    T_Fav[Favorites Tab]
+    T_Prof[Profile Tab]
+    
+    %% Main Screens
+    S_List[Note List Screen]
+    S_Add[Add Note Screen]
+    S_Detail[Note Detail Screen]
+    S_Edit[Edit Note Screen]
+
+    %% Forward Navigasi
+    T_Notes ===> S_List
+    S_List -- "Click FAB" --> S_Add
+    S_List -- "Click Item" --> S_Detail
+    T_Fav -- "Click Item" --> S_Detail
+    S_Detail -- "Click Edit" --> S_Edit
+
+    %% Back Navigasi
+    S_Add -. "Back" .-> S_List
+    S_Detail -. "Back" .-> S_List
+    S_Edit -. "Back" .-> S_Detail
+
+    %% Styling Warna
+    classDef tab fill:#5C7A3E,stroke:#3D5229,stroke-width:2px,color:#fff;
+    classDef screen fill:#252D1C,stroke:#A8C57E,stroke-width:2px,color:#fff;
+    
+    class T_Notes,T_Fav,T_Prof tab;
+    class S_List,S_Add,S_Detail,S_Edit screen;
+```
 
 ## 🎥 Video Demo (30 Detik)
 Video demonstrasi yang menunjukkan semua alur navigasi dapat dilihat pada tautan berikut:
