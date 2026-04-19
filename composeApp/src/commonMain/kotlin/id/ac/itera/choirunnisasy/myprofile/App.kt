@@ -79,23 +79,6 @@ import id.ac.itera.choirunnisasy.myprofile.navigation.AppNavigation
 import id.ac.itera.choirunnisasy.myprofile.data.ProfileUiState
 import kotlinx.coroutines.delay
 
-// ─── COLORS ───────────────────────────────────────────────────────────────────
-private val matchaDeep     = Color(0xFF3D5229)
-private val matcha         = Color(0xFF5C7A3E)
-private val matchaLight    = Color(0xFFA8C57E)
-private val matchaPale     = Color(0xFFD4E8B8)
-private val strawberry     = Color(0xFFC0392B)
-private val strawberryPale = Color(0xFFFDECEA)
-private val cream          = Color(0xFFFAF6F0)
-private val creamDark      = Color(0xFFF0E8DC)
-private val warmWhite      = Color(0xFFFFFDF9)
-private val charcoal       = Color(0xFF1A1A1A)
-private val darkBg         = Color(0xFF1A1F14)
-private val darkSurface    = Color(0xFF252D1C)
-private val darkCard       = Color(0xFF2E3822)
-private val darkText       = Color(0xFFE8F0D8)
-private val darkSubtext    = Color(0xFFA8B898)
-
 // ─── ROOT ─────────────────────────────────────────────────────────────────────
 @Composable
 fun App() {
@@ -107,7 +90,8 @@ fun App() {
 fun ProfileScreen(
     uiState      : ProfileUiState,
     onEditClick  : () -> Unit,
-    onToggleDark : () -> Unit
+    onToggleDark : () -> Unit,
+    onNewsClick  : () -> Unit
 ) {
     val isDark = uiState.isDarkMode
 
@@ -347,6 +331,35 @@ fun ProfileScreen(
                             )
                         }
                     }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // 7. 🍵 TAMBAHAN BARU: News Button (Tombol Berita)
+            AnimatedVisibility(
+                visible = cardsVisible,
+                enter   = fadeIn(tween(600, delayMillis = 800)) +
+                        slideInVertically(tween(600, delayMillis = 800)) { 50 }
+            ) {
+                Button(
+                    onClick = onNewsClick,
+                    modifier = Modifier
+                        .padding(horizontal = 20.dp)
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    shape = RoundedCornerShape(22.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isDark) darkSurface else matchaLight,
+                        contentColor = if (isDark) matchaLight else matchaDeep
+                    ),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                ) {
+                    Text(
+                        text = "🗞️ Baca Berita Tech",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
                 }
             }
 

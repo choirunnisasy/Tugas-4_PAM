@@ -14,310 +14,82 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.*
 import androidx.navigation.navArgument
+
+// 🍓 IMPORT MANUAL (PASTIKAN JALURNYA BENAR)
 import id.ac.itera.choirunnisasy.myprofile.ProfileScreen
-import id.ac.itera.choirunnisasy.myprofile.navigation.Screen
-import id.ac.itera.choirunnisasy.myprofile.screen.AddNoteScreen
-import id.ac.itera.choirunnisasy.myprofile.screen.EditNoteScreen
-import id.ac.itera.choirunnisasy.myprofile.screen.FavoritesScreen
-import id.ac.itera.choirunnisasy.myprofile.screen.NoteDetailScreen
-import id.ac.itera.choirunnisasy.myprofile.screen.NoteListScreen
 import id.ac.itera.choirunnisasy.myprofile.ui.*
+import id.ac.itera.choirunnisasy.myprofile.screen.*
 import id.ac.itera.choirunnisasy.myprofile.viewmodel.NoteViewModel
 import id.ac.itera.choirunnisasy.myprofile.viewmodel.ProfileViewModel
 
-// ── COLORS ────────────────────────────────────────────────────────────────────
-private val matchaDeep  = Color(0xFF3D5229)
-private val matcha      = Color(0xFF5C7A3E)
-private val matchaLight = Color(0xFFA8C57E)
-private val strawberry  = Color(0xFFC0392B)
-private val darkBg      = Color(0xFF1A1F14)
-private val darkSurface = Color(0xFF252D1C)
-
-// ── Bottom Nav Item Data Class ─────────────────────────────────────────────────
-data class BottomNavItem(
-    val screen      : Screen,
-    val icon        : ImageVector,
-    val iconSelected: ImageVector,
-    val label       : String
-)
-
-// ── AppNavigation ──────────────────────────────────────────────────────────────
 @Composable
 fun AppNavigation() {
-    val navController     = rememberNavController()
-    val profileViewModel  : ProfileViewModel = viewModel()
-    val noteViewModel     : NoteViewModel    = viewModel()
+    val navController = rememberNavController()
+    val profileViewModel: ProfileViewModel = viewModel()
+    val noteViewModel: NoteViewModel = viewModel()
+    val newsViewModel: NewsViewModel = viewModel()
 
     val profileUiState by profileViewModel.uiState.collectAsState()
     val isDark = profileUiState.isDarkMode
 
-    // Bottom nav items
-    val bottomNavItems = listOf(
-        BottomNavItem(
-            screen       = Screen.Notes,
-            icon         = Icons.Rounded.EditNote,
-            iconSelected = Icons.Rounded.EditNote,
-            label        = "Notes"
-        ),
-        BottomNavItem(
-            screen       = Screen.Favorites,
-            icon         = Icons.Rounded.FavoriteBorder,
-            iconSelected = Icons.Rounded.Favorite,
-            label        = "Favorites"
-        ),
-        BottomNavItem(
-            screen       = Screen.Profile,
-            icon         = Icons.Rounded.PersonOutline,
-            iconSelected = Icons.Rounded.Person,
-            label        = "Profile"
-        )
-    )
-
-    // Screens yang tampilkan bottom nav
-    val bottomNavRoutes = listOf(
-        Screen.Notes.route,
-        Screen.Favorites.route,
-        Screen.Profile.route
-    )
-
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
-
-    // Warna Bottom Nav berdasarkan dark mode
-    val navBarColor     = if (isDark) darkSurface else Color.White
-    val navBarIndicator = if (isDark) matchaLight.copy(alpha = 0.2f) else matchaLight.copy(alpha = 0.3f)
-    val navBarSelected  = if (isDark) matchaLight else matchaDeep
-    val navBarUnselected = if (isDark) Color(0xFF6B7B5A) else Color(0xFF9E9E9E)
-
     Scaffold(
-        containerColor = Color.Transparent,
         bottomBar = {
-            // Tampilkan bottom nav hanya di tab utama
-            if (currentRoute in bottomNavRoutes) {
-                NavigationBar(
-                    containerColor = navBarColor,
-                    tonalElevation = 8.dp,
-                    modifier       = Modifier.height(64.dp)
-                ) {
-                    bottomNavItems.forEach { item ->
-                        val isSelected = currentRoute == item.screen.route
-                        NavigationBarItem(
-                            selected = isSelected,
-                            onClick  = {
-                                navController.navigate(item.screen.route) {
-                                    popUpTo(Screen.Notes.route) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState    = true
-                                }
-                            },
-                            icon = {
-                                Icon(
-                                    imageVector = if (isSelected)
-                                        item.iconSelected
-                                    else
-                                        item.icon,
-                                    contentDescription = item.label
-                                )
-                            },
-                            label  = { Text(item.label) },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor   = navBarSelected,
-                                selectedTextColor   = navBarSelected,
-                                unselectedIconColor = navBarUnselected,
-                                unselectedTextColor = navBarUnselected,
-                                indicatorColor      = navBarIndicator
-                            )
-                        )
-                    }
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentRoute = navBackStackEntry?.destination?.route
+            if (currentRoute in listOf(Screen.Notes.route, Screen.Favorites.route, Screen.Profile.route)) {
+                NavigationBar(containerColor = if (isDark) Color(0xFF252D1C) else Color.White) {
+                    NavigationBarItem(
+                        selected = currentRoute == Screen.Notes.route,
+                        onClick = { navController.navigate(Screen.Notes.route) { popUpTo(Screen.Notes.route); launchSingleTop = true } },
+                        icon = { Icon(Icons.Rounded.EditNote, "Notes") },
+                        label = { Text("Notes") }
+                    )
+                    NavigationBarItem(
+                        selected = currentRoute == Screen.Favorites.route,
+                        onClick = { navController.navigate(Screen.Favorites.route) { launchSingleTop = true } },
+                        icon = { Icon(Icons.Rounded.Favorite, "Fav") },
+                        label = { Text("Favorites") }
+                    )
+                    NavigationBarItem(
+                        selected = currentRoute == Screen.Profile.route,
+                        onClick = { navController.navigate(Screen.Profile.route) { launchSingleTop = true } },
+                        icon = { Icon(Icons.Rounded.Person, "Profile") },
+                        label = { Text("Profile") }
+                    )
                 }
             }
         }
-    ) { paddingValues ->
-        NavHost(
-            navController    = navController,
-            startDestination = Screen.Notes.route,
-            modifier         = Modifier.padding(paddingValues)
-        ) {
-            // ── Notes Tab ─────────────────────────────────────────
-            composable(
-                route = Screen.Notes.route,
-                enterTransition  = { fadeIn(tween(300)) },
-                exitTransition   = { fadeOut(tween(300)) }
-            ) {
-                NoteListScreen(
-                    isDark = isDark,
-                    onNoteClick = { noteId ->
-                        navController.navigate(Screen.NoteDetail.createRoute(noteId))
-                    },
-                    onAddClick = {
-                        navController.navigate(Screen.AddNote.route)
-                    },
-                    viewModel = noteViewModel
-                )
+    ) { padding ->
+        NavHost(navController, Screen.Notes.route, Modifier.padding(padding)) {
+            composable(Screen.Notes.route) { NoteListScreen(isDark, { navController.navigate(Screen.NoteDetail.createRoute(it)) }, { navController.navigate(Screen.AddNote.route) }, noteViewModel) }
+            composable(Screen.Favorites.route) { FavoritesScreen(isDark, { navController.navigate(Screen.NoteDetail.createRoute(it)) }, noteViewModel) }
+            composable(Screen.Profile.route) { ProfileScreenWrapper(profileViewModel, isDark) { navController.navigate(Screen.NewsList.route) } }
+
+            // 🍓 RUTE NEWS
+            composable(Screen.NewsList.route) { NewsListScreen(newsViewModel, isDark, { navController.popBackStack() }) { id -> navController.navigate(Screen.NewsDetail.createRoute(id)) } }
+            composable(Screen.NewsDetail.route, listOf(navArgument("articleId") { type = NavType.IntType })) { backStackEntry ->
+                val id = backStackEntry.arguments?.getInt("articleId") ?: 0
+                NewsDetailScreen(id, newsViewModel, isDark) { navController.popBackStack() }
             }
 
-            // ── Favorites Tab ─────────────────────────────────────
-            composable(
-                route = Screen.Favorites.route,
-                enterTransition  = { fadeIn(tween(300)) },
-                exitTransition   = { fadeOut(tween(300)) }
-            ) {
-                FavoritesScreen(
-                    isDark = isDark,
-                    onNoteClick = { noteId ->
-                        navController.navigate(Screen.NoteDetail.createRoute(noteId))
-                    },
-                    viewModel = noteViewModel
-                )
-            }
-
-            // ── Profile Tab ───────────────────────────────────────
-            composable(
-                route = Screen.Profile.route,
-                enterTransition  = { fadeIn(tween(300)) },
-                exitTransition   = { fadeOut(tween(300)) }
-            ) {
-                ProfileScreenWrapper(
-                    profileViewModel = profileViewModel,
-                    isDark           = isDark
-                )
-            }
-
-            // ── Note Detail ───────────────────────────────────────
-            composable(
-                route     = Screen.NoteDetail.route,
-                arguments = listOf(
-                    navArgument("noteId") { type = NavType.IntType }
-                ),
-                enterTransition = {
-                    slideInHorizontally(tween(400)) { it } + fadeIn(tween(400))
-                },
-                exitTransition = {
-                    slideOutHorizontally(tween(400)) { it } + fadeOut(tween(400))
-                }
-            ) { backStackEntry ->
-                val noteId = backStackEntry.arguments?.getInt("noteId") ?: 0
-                NoteDetailScreen(
-                    noteId = noteId,
-                    isDark = isDark,
-                    onBack = { navController.popBackStack() },
-                    onEdit = { id ->
-                        navController.navigate(
-                            Screen.EditNote.createRoute(
-                                id
-                            )
-                        )
-                    },
-                    viewModel = noteViewModel
-                )
-            }
-
-            // ── Add Note ──────────────────────────────────────────
-            composable(
-                route = Screen.AddNote.route,
-                enterTransition = {
-                    slideInHorizontally(tween(400)) { it } + fadeIn(tween(400))
-                },
-                exitTransition = {
-                    slideOutHorizontally(tween(400)) { it } + fadeOut(tween(400))
-                }
-            ) {
-                AddNoteScreen(
-                    isDark = isDark,
-                    onBack = { navController.popBackStack() },
-                    viewModel = noteViewModel
-                )
-            }
-
-            // ── Edit Note ─────────────────────────────────────────
-            composable(
-                route     = Screen.EditNote.route,
-                arguments = listOf(
-                    navArgument("noteId") { type = NavType.IntType }
-                ),
-                enterTransition = {
-                    slideInHorizontally(tween(400)) { it } + fadeIn(tween(400))
-                },
-                exitTransition = {
-                    slideOutHorizontally(tween(400)) { it } + fadeOut(tween(400))
-                }
-            ) { backStackEntry ->
-                val noteId = backStackEntry.arguments?.getInt("noteId") ?: 0
-                EditNoteScreen(
-                    noteId = noteId,
-                    isDark = isDark,
-                    onBack = { navController.popBackStack() },
-                    viewModel = noteViewModel
-                )
-            }
+            // Rute Lainnya
+            composable(Screen.NoteDetail.route, listOf(navArgument("noteId") { type = NavType.IntType })) { NoteDetailScreen(it.arguments?.getInt("noteId") ?: 0, isDark, { navController.popBackStack() }, { id -> navController.navigate(Screen.EditNote.createRoute(id)) }, noteViewModel) }
+            composable(Screen.AddNote.route) { AddNoteScreen(isDark, { navController.popBackStack() }, noteViewModel) }
+            composable(Screen.EditNote.route, listOf(navArgument("noteId") { type = NavType.IntType })) { EditNoteScreen(it.arguments?.getInt("noteId") ?: 0, isDark, { navController.popBackStack() }, noteViewModel) }
         }
     }
 }
 
-// ── ProfileScreenWrapper ──────────────────────────────────────────────────────
-// Wrapper untuk ProfileScreen agar bisa dipakai di NavHost
 @Composable
-fun ProfileScreenWrapper(
-    profileViewModel : ProfileViewModel,
-    isDark           : Boolean
-) {
+fun ProfileScreenWrapper(profileViewModel: ProfileViewModel, isDark: Boolean, onNewsClick: () -> Unit) {
     val uiState by profileViewModel.uiState.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    LaunchedEffect(uiState.isSaved) {
-        if (uiState.isSaved) {
-            snackbarHostState.showSnackbar("Profil berhasil disimpan!")
-            profileViewModel.onSavedFeedbackShown()
-        }
-    }
-
-    AnimatedContent(
-        targetState  = uiState.isEditMode,
-        transitionSpec = {
-            if (targetState) {
-                (slideInHorizontally(tween(400)) { it } +
-                        fadeIn(tween(400))).togetherWith(
-                    slideOutHorizontally(tween(400)) { -it } +
-                            fadeOut(tween(400))
-                )
-            } else {
-                (slideInHorizontally(tween(400)) { -it } +
-                        fadeIn(tween(400))).togetherWith(
-                    slideOutHorizontally(tween(400)) { it } +
-                            fadeOut(tween(400))
-                )
-            }
-        },
-        label = "profileTransition"
-    ) { isEditing ->
-        if (isEditing) {
-            EditProfileScreen(
-                uiState          = uiState,
-                onNameChange     = { profileViewModel.onNameChange(it) },
-                onBioChange      = { profileViewModel.onBioChange(it) },
-                onEmailChange    = { profileViewModel.onEmailChange(it) },
-                onPhoneChange    = { profileViewModel.onPhoneChange(it) },
-                onLocationChange = { profileViewModel.onLocationChange(it) },
-                onSave           = { profileViewModel.saveProfile() },
-                onCancel         = { profileViewModel.cancelEdit() }
-            )
-        } else {
-            ProfileScreen(
-                uiState = uiState,
-                onEditClick = { profileViewModel.enterEditMode() },
-                onToggleDark = { profileViewModel.toggleDarkMode() }
-            )
-        }
+    AnimatedContent(targetState = uiState.isEditMode) { isEditing ->
+        if (isEditing) EditProfileScreen(uiState, { profileViewModel.onNameChange(it) }, { profileViewModel.onBioChange(it) }, { profileViewModel.onEmailChange(it) }, { profileViewModel.onPhoneChange(it) }, { profileViewModel.onLocationChange(it) }, { profileViewModel.saveProfile() }, { profileViewModel.cancelEdit() })
+        else ProfileScreen(uiState, { profileViewModel.enterEditMode() }, { profileViewModel.toggleDarkMode() }, onNewsClick)
     }
 }
