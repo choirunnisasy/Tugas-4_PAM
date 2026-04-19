@@ -97,6 +97,11 @@ navigation/
 *
 
 ---
+## 🎥 Video Demo (30 Detik)
+Video demonstrasi yang menunjukkan semua alur navigasi dapat dilihat pada tautan berikut:
+**[Tonton Video Demo di sini](https://drive.google.com/file/d/1eMPofH1_rb5TyRv9aoE93GQz9WfNn6Kz/view?usp=sharing)**
+
+---
 
 ##  Tech Stack
 
