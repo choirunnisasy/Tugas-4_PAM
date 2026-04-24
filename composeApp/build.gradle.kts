@@ -7,6 +7,15 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.sqldelight)
+}
+
+sqldelight {
+    databases {
+        create("NotesDatabase") {
+            packageName.set("id.ac.itera.choirunnisasy.myprofile.db")
+        }
+    }
 }
 
 kotlin {
@@ -31,9 +40,10 @@ kotlin {
     
     sourceSets {
         androidMain.dependencies {
-            implementation(libs.compose.uiToolingPreview)
+            implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
             implementation("io.ktor:ktor-client-android:2.3.9")
+            implementation(libs.sqldelight.android)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -41,7 +51,6 @@ kotlin {
             implementation(libs.compose.material3)
             implementation(libs.compose.ui)
             implementation(libs.compose.components.resources)
-            implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(compose.materialIconsExtended)
@@ -51,14 +60,23 @@ kotlin {
             implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.9")
             implementation("media.kamel:kamel-image:0.9.3")
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
-            implementation("eu.bambooapps:compose-material3-pullrefresh:1.0.1")
+            
+            implementation(libs.sqldelight.runtime)
+            implementation(libs.sqldelight.coroutines)
+            implementation(libs.settings.core)
+            implementation(libs.settings.coroutines)
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
+        iosMain.dependencies {
+            implementation(libs.sqldelight.native)
+        }
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
-            implementation(libs.kotlinx.coroutinesSwing)
+            implementation(libs.kotlinx.coroutines.swing)
+            implementation(libs.sqldelight.jvm)
         }
     }
 }
@@ -91,7 +109,7 @@ android {
 }
 
 dependencies {
-    debugImplementation(libs.compose.uiTooling)
+    debugImplementation(libs.compose.ui.tooling)
 }
 
 compose.desktop {

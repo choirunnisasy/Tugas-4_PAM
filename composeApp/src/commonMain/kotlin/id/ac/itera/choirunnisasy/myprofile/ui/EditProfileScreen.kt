@@ -441,6 +441,7 @@ fun ReadOnlyField(
             contentDescription = "Read only",
             tint     = subtextColor,
             modifier = Modifier.size(16.dp)
+
         )
     }
 }

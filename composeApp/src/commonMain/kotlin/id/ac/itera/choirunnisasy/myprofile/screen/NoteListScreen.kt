@@ -21,52 +21,34 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import id.ac.itera.choirunnisasy.myprofile.*
 import id.ac.itera.choirunnisasy.myprofile.data.Note
 import id.ac.itera.choirunnisasy.myprofile.viewmodel.NoteViewModel
 
-// ── COLORS ────────────────────────────────────────────────────────────────────
-private val matchaDeep  = Color(0xFF3D5229)
-private val matcha      = Color(0xFF5C7A3E)
-private val matchaLight = Color(0xFFA8C57E)
-private val matchaPale  = Color(0xFFD4E8B8)
-private val strawberry  = Color(0xFFC0392B)
-private val cream       = Color(0xFFFAF6F0)
-private val warmWhite   = Color(0xFFFFFDF9)
-private val charcoal    = Color(0xFF1A1A1A)
-private val darkBg      = Color(0xFF1A1F14)
-private val darkCard    = Color(0xFF2E3822)
-private val darkText    = Color(0xFFE8F0D8)
-private val darkSubtext = Color(0xFFA8B898)
-
 @Composable
 fun NoteListScreen(
-    isDark        : Boolean = false,
-    onNoteClick   : (Int) -> Unit,
-    onAddClick    : () -> Unit,
-    viewModel     : NoteViewModel = viewModel()
+    isDark: Boolean,
+    onNoteClick: (Int) -> Unit,
+    onAddClick: () -> Unit,
+    onSettingsClick: () -> Unit,
+    viewModel: NoteViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val filteredNotes = viewModel.getFilteredNotes()
+    val filteredNotes = uiState.notes
 
-    val bgColor   = if (isDark) darkBg    else cream
-    val textColor = if (isDark) darkText  else charcoal
+    val bgColor = if (isDark) darkBg else cream
+    val textColor = if (isDark) darkText else charcoal
 
     Scaffold(
         containerColor = bgColor,
-        contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0),
         floatingActionButton = {
-            // FAB untuk Add Note
             FloatingActionButton(
-                onClick          = onAddClick,
-                containerColor   = matcha,
-                contentColor     = Color.White,
-                shape            = RoundedCornerShape(18.dp)
+                onClick = onAddClick,
+                containerColor = matcha,
+                contentColor = Color.White,
+                shape = RoundedCornerShape(18.dp)
             ) {
-                Icon(
-                    imageVector        = Icons.Rounded.Add,
-                    contentDescription = "Add Note"
-                )
+                Icon(Icons.Rounded.Add, contentDescription = "Add Note")
             }
         }
     ) { paddingValues ->
@@ -90,92 +72,72 @@ fun NoteListScreen(
                     .statusBarsPadding()
                     .padding(horizontal = 20.dp, vertical = 24.dp)
             ) {
-                Column {
-                    Text(
-                        text       = "My Notes 📝",
-                        fontSize   = 26.sp,
-                        fontWeight = FontWeight.Black,
-                        color      = Color.White
-                    )
-                    Text(
-                        text     = "${filteredNotes.size} catatan",
-                        fontSize = 13.sp,
-                        color    = Color.White.copy(alpha = 0.7f)
-                    )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = "My Notes 📝",
+                            fontSize = 26.sp,
+                            fontWeight = FontWeight.Black,
+                            color = Color.White
+                        )
+                        Text(
+                            text = "${filteredNotes.size} catatan",
+                            fontSize = 13.sp,
+                            color = Color.White.copy(alpha = 0.7f)
+                        )
+                    }
+                    IconButton(onClick = onSettingsClick) {
+                        Icon(Icons.Rounded.Settings, contentDescription = "Settings", tint = Color.White)
+                    }
                 }
             }
 
             // ── Search Bar ────────────────────────────────────────
             OutlinedTextField(
-                value         = uiState.searchQuery,
+                value = uiState.searchQuery,
                 onValueChange = { viewModel.onSearchChange(it) },
-                placeholder   = { Text("Cari catatan...", fontSize = 14.sp) },
-                leadingIcon   = {
-                    Icon(
-                        Icons.Rounded.Search,
-                        contentDescription = null,
-                        tint = matcha
-                    )
+                placeholder = { Text("Cari catatan...", fontSize = 14.sp) },
+                leadingIcon = {
+                    Icon(Icons.Rounded.Search, contentDescription = null, tint = matcha)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 12.dp),
-                shape  = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor   = matcha,
+                    focusedBorderColor = matcha,
                     unfocusedBorderColor = matchaLight.copy(alpha = 0.5f),
-                    focusedContainerColor   = if (isDark) darkCard else warmWhite,
+                    focusedContainerColor = if (isDark) darkCard else warmWhite,
                     unfocusedContainerColor = if (isDark) darkCard else warmWhite,
-                    focusedTextColor     = textColor,
-                    unfocusedTextColor   = textColor
+                    focusedTextColor = textColor,
+                    unfocusedTextColor = textColor
                 ),
                 singleLine = true
             )
 
-            // ── Note List ─────────────────────────────────────────
-            if (filteredNotes.isEmpty()) {
-                // Empty state
-                Box(
-                    modifier         = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = "🍵", fontSize = 48.sp)
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(
-                            text       = "Belum ada catatan",
-                            fontSize   = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color      = if (isDark) darkSubtext else Color(0xFF999999)
-                        )
-                        Text(
-                            text     = "Tap + untuk tambah catatan baru",
-                            fontSize = 13.sp,
-                            color    = if (isDark) darkSubtext else Color(0xFFAAAAAA)
-                        )
-                    }
+            // ── UI States ─────────────────────────────────────────
+            if (uiState.isLoading) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = strawberry)
                 }
+            } else if (filteredNotes.isEmpty()) {
+                EmptyNotesState(isDark)
             } else {
                 LazyColumn(
-                    contentPadding    = PaddingValues(
-                        start  = 16.dp,
-                        end    = 16.dp,
-                        bottom = 80.dp
-                    ),
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 80.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     items(filteredNotes, key = { it.id }) { note ->
-                        AnimatedVisibility(
-                            visible = true,
-                            enter   = fadeIn(tween(300)) + slideInVertically(tween(300))
-                        ) {
-                            NoteCard(
-                                note      = note,
-                                isDark    = isDark,
-                                onClick   = { onNoteClick(note.id) },
-                                onFavorite = { viewModel.toggleFavorite(note.id) }
-                            )
-                        }
+                        NoteCard(
+                            note = note,
+                            isDark = isDark,
+                            onClick = { onNoteClick(note.id) },
+                            onFavorite = { viewModel.toggleFavorite(note.id) }
+                        )
                     }
                 }
             }
@@ -183,22 +145,45 @@ fun NoteListScreen(
     }
 }
 
-// ── NoteCard ──────────────────────────────────────────────────────────────────
+@Composable
+fun EmptyNotesState(isDark: Boolean) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(text = "🍵", fontSize = 48.sp)
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = "Belum ada catatan",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = if (isDark) darkSubtext else Color(0xFF999999)
+            )
+            Text(
+                text = "Tap + untuk tambah catatan baru",
+                fontSize = 13.sp,
+                color = if (isDark) darkSubtext else Color(0xFFAAAAAA)
+            )
+        }
+    }
+}
+
 @Composable
 fun NoteCard(
-    note      : Note,
-    isDark    : Boolean,
-    onClick   : () -> Unit,
-    onFavorite : () -> Unit
+    note: Note,
+    isDark: Boolean,
+    onClick: () -> Unit,
+    onFavorite: () -> Unit
 ) {
     val cardColor = if (isDark) darkCard else warmWhite
 
     Card(
-        modifier  = Modifier
+        modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() },
-        shape     = RoundedCornerShape(20.dp),
-        colors    = CardDefaults.cardColors(containerColor = cardColor),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = cardColor),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
@@ -208,7 +193,6 @@ fun NoteCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Emoji
             Box(
                 modifier = Modifier
                     .size(48.dp)
@@ -219,33 +203,28 @@ fun NoteCard(
                 Text(text = note.emoji, fontSize = 22.sp)
             }
 
-            // Title & Content
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text       = note.title,
-                    fontSize   = 15.sp,
+                    text = note.title,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
-                    color      = if (isDark) darkText else charcoal,
-                    maxLines   = 1,
-                    overflow   = TextOverflow.Ellipsis
+                    color = if (isDark) darkText else charcoal,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Spacer(modifier = Modifier.height(3.dp))
                 Text(
-                    text     = note.content,
+                    text = note.content,
                     fontSize = 13.sp,
-                    color    = if (isDark) darkSubtext else Color(0xFF888888),
+                    color = if (isDark) darkSubtext else Color(0xFF888888),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
             }
 
-            // Favorite button
             IconButton(onClick = onFavorite) {
                 Icon(
-                    imageVector = if (note.isFavorite)
-                        Icons.Rounded.Favorite
-                    else
-                        Icons.Rounded.FavoriteBorder,
+                    imageVector = if (note.isFavorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
                     contentDescription = "Favorite",
                     tint = if (note.isFavorite) strawberry else Color(0xFFCCCCCC)
                 )

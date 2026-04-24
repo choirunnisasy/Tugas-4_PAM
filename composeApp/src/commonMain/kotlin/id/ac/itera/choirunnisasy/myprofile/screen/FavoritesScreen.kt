@@ -23,30 +23,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import id.ac.itera.choirunnisasy.myprofile.*
 import id.ac.itera.choirunnisasy.myprofile.data.Note
 import id.ac.itera.choirunnisasy.myprofile.viewmodel.NoteViewModel
-
-// ── COLORS ────────────────────────────────────────────────────────────────────
-private val matchaDeep  = Color(0xFF3D5229)
-private val matcha      = Color(0xFF5C7A3E)
-private val matchaLight = Color(0xFFA8C57E)
-private val matchaPale  = Color(0xFFD4E8B8)
-private val strawberry  = Color(0xFFC0392B)
-private val strawberryPale = Color(0xFFFDECEA)
-private val cream       = Color(0xFFFAF6F0)
-private val warmWhite   = Color(0xFFFFFDF9)
-private val charcoal    = Color(0xFF1A1A1A)
-private val darkBg      = Color(0xFF1A1F14)
-private val darkCard    = Color(0xFF2E3822)
-private val darkText    = Color(0xFFE8F0D8)
-private val darkSubtext = Color(0xFFA8B898)
 
 @Composable
 fun FavoritesScreen(
     isDark      : Boolean = false,
     onNoteClick : (Int) -> Unit,
-    viewModel   : NoteViewModel = viewModel()
+    viewModel   : NoteViewModel
 ) {
     val uiState      by viewModel.uiState.collectAsState()
     val favoriteNotes = uiState.notes.filter { it.isFavorite }

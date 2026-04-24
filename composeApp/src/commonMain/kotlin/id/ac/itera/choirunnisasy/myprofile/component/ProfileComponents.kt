@@ -263,3 +263,27 @@ fun FooterNote(
         )
     }
 }
+
+// ─── COMPOSABLE 7: EmojiOption ────────────────────────────────────────────────
+@Composable
+fun EmojiOption(
+    emoji: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .size(42.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(if (isSelected) matcha.copy(alpha = 0.15f) else Color.Transparent)
+            .border(
+                width = if (isSelected) 1.5.dp else 1.dp,
+                color = if (isSelected) matcha else Color.LightGray.copy(alpha = 0.3f),
+                shape = RoundedCornerShape(12.dp)
+            )
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        Text(text = emoji, fontSize = 20.sp)
+    }
+}

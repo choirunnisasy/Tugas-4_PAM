@@ -77,15 +77,18 @@ import id.ac.itera.choirunnisasy.myprofile.component.ProfileTag
 import id.ac.itera.choirunnisasy.myprofile.component.SkillChip
 import id.ac.itera.choirunnisasy.myprofile.navigation.AppNavigation
 import id.ac.itera.choirunnisasy.myprofile.data.ProfileUiState
+import id.ac.itera.choirunnisasy.myprofile.db.DatabaseDriverFactory
+import com.russhwolf.settings.ExperimentalSettingsApi
 import kotlinx.coroutines.delay
 
-// ─── ROOT ─────────────────────────────────────────────────────────────────────
+@OptIn(ExperimentalSettingsApi::class)
 @Composable
-fun App() {
-    AppNavigation()
+fun App(driverFactory: DatabaseDriverFactory) {
+    val settings = remember { createSettings() }  // ← pakai expect/actual
+    AppNavigation(driverFactory, settings)
 }
 
-// ─── PROFILE SCREEN ───────────────────────────────────────────────────────────
+
 @Composable
 fun ProfileScreen(
     uiState      : ProfileUiState,
@@ -153,14 +156,12 @@ fun ProfileScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            // 1. Header
             ProfileHeaderWithToggle(
                 visible      = headerVisible,
                 isDark       = isDark,
                 onToggleDark = onToggleDark
             )
 
-            // 2. Name Card
             NameCard(
                 visible  = contentVisible,
                 uiState  = uiState,
@@ -170,7 +171,6 @@ fun ProfileScreen(
                     .offset(y = (-52).dp)
             )
 
-            // 3. Contact Info
             Spacer(modifier = Modifier.height((-38).dp))
 
             SectionTitleDark(
@@ -179,7 +179,6 @@ fun ProfileScreen(
                 modifier = Modifier.padding(horizontal = 24.dp, vertical = 6.dp)
             )
 
-            // InfoCard
             AnimatedVisibility(
                 visible = cardsVisible,
                 enter   = fadeIn(tween(500)) + slideInHorizontally(tween(500)) { -60 }
@@ -224,7 +223,6 @@ fun ProfileScreen(
                 )
             }
 
-            // 4. Skills
             Spacer(modifier = Modifier.height(16.dp))
 
             SectionTitleDark(
@@ -247,7 +245,6 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // 5. Edit Profile Button
             AnimatedVisibility(
                 visible = cardsVisible,
                 enter   = fadeIn(tween(600, delayMillis = 600)) +
@@ -284,7 +281,6 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 6. Contact Button
             AnimatedVisibility(
                 visible = cardsVisible,
                 enter   = fadeIn(tween(600, delayMillis = 700)) +
@@ -336,7 +332,6 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // 7. 🍵 TAMBAHAN BARU: News Button (Tombol Berita)
             AnimatedVisibility(
                 visible = cardsVisible,
                 enter   = fadeIn(tween(600, delayMillis = 800)) +
@@ -363,7 +358,6 @@ fun ProfileScreen(
                 }
             }
 
-            // Footer
             Column(
                 modifier            = Modifier
                     .fillMaxWidth()
@@ -401,7 +395,6 @@ fun ProfileScreen(
     }
 }
 
-// ─── ProfileHeaderWithToggle ──────────────────────────────────────────────────
 @Composable
 private fun ProfileHeaderWithToggle(
     visible      : Boolean,
@@ -450,10 +443,8 @@ private fun ProfileHeaderWithToggle(
         }
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            // Padding untuk status bar
             Spacer(modifier = Modifier.height(40.dp))
 
-            // Dark Mode Toggle — state di ViewModel
             Row(
                 modifier              = Modifier
                     .fillMaxWidth()
@@ -490,7 +481,6 @@ private fun ProfileHeaderWithToggle(
     }
 }
 
-// ─── ProfilePhotoWidget ───────────────────────────────────────────────────────
 @Composable
 private fun ProfilePhotoWidget() {
     val infiniteTransition = rememberInfiniteTransition(label = "ring")
@@ -554,7 +544,6 @@ private fun ProfilePhotoWidget() {
     }
 }
 
-// ─── NameCard ─────────────────────────────────────────────────────────────────
 @Composable
 private fun NameCard(
     visible  : Boolean,
@@ -579,7 +568,6 @@ private fun NameCard(
                 color = matchaLight.copy(alpha = if (isDark) 0.2f else 0.3f)
             )
         ) {
-            // Accent bar
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -632,7 +620,6 @@ private fun NameCard(
     }
 }
 
-// ─── SectionTitleDark ─────────────────────────────────────────────────────────
 @Composable
 private fun SectionTitleDark(
     title      : String,
@@ -666,7 +653,6 @@ private fun SectionTitleDark(
     }
 }
 
-// ─── SkillsSectionDark ────────────────────────────────────────────────────────
 @Composable
 private fun SkillsSectionDark(isDark: Boolean, modifier: Modifier = Modifier) {
     val skills = listOf(
