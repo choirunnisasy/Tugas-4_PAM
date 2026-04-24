@@ -1,34 +1,30 @@
-# Tugas Praktikum Minggu 5 - Navigasi Antar Layar
+# Notes App - Offline First (KMP)
 
 - **Nama:** Choirunnisa
 - **NIM:** 123140136
 - **Mata Kuliah:** Pengembangan Aplikasi Mobile RB
 
-##  Deskripsi Tugas
-Project ini merupakan pengembangan dari Notes App sebelumnya dengan penambahan fitur navigasi multi-screen menggunakan Compose Multiplatform sesuai dengan modul pertemuan 5.
+[cite_start]Aplikasi pencatatan (*Notes App*) berbasis **Kotlin Multiplatform (KMP)** yang dirancang dengan arsitektur *Offline-First*[cite: 514, 519]. Aplikasi ini memastikan data pengguna tetap aman dan dapat diakses kapan saja, tanpa bergantung pada koneksi internet, dengan mengusung antarmuka yang bersih, *minimalist*, dan *modern*.
 
-##  Fitur yang Diimplementasikan
-- [x] Bottom Navigation dengan 3 tabs (Notes, Favorites, Profile).
-- [x] Navigasi Note List → Note Detail dengan mengirimkan `noteId`.
-- [x] Floating Action Button (FAB) untuk navigasi ke halaman Add Note.
-- [x] Back navigation yang berjalan baik dari semua layar.
-- [x] Navigasi ke halaman Edit Note dengan mengirimkan `noteId` sebagai *argument*.
-- [x] Struktur folder telah disesuaikan (`navigation/`, `screens/`, `components/`).
+[cite_start]Proyek ini dikembangkan untuk memenuhi **Tugas Praktikum Minggu 7 - Pengembangan Aplikasi Mobile**[cite: 511].
 
-##  Screenshots Layar
-*(Tambahkan screenshot untuk masing-masing layar di bawah ini)*
+## ✨ Fitur Utama
 
-| Notes List | Favorites | Profile |
-|:---:|:---:|:---:|
-| ![Notes List](link_gambar_notes_list) | ![Favorites](link_gambar_favorites) | ![Profile](link_gambar_profile) |
+* [cite_start]**CRUD Operations:** Mendukung pembuatan (Create), pembacaan (Read), pembaruan (Update), dan penghapusan (Delete) catatan secara lokal[cite: 516].
+* [cite_start]**Smart Search:** Fitur pencarian *real-time* untuk menemukan catatan spesifik berdasarkan judul atau isi[cite: 517].
+* [cite_start]**User Preferences (DataStore):** Pengaturan personalisasi aplikasi seperti pilihan Tema (Light/Dark/System) dan urutan penyortiran catatan, disimpan dengan aman menggunakan `multiplatform-settings`[cite: 518, 78, 80].
+* [cite_start]**Offline-First Architecture:** Mengandalkan **SQLDelight** sebagai *Single Source of Truth*, memastikan pengalaman pengguna yang mulus tanpa jeda *network*[cite: 515, 519, 490].
+* [cite_start]**Reactive UI States:** Penanganan status layar yang responsif menggunakan `StateFlow` untuk transisi *Loading*, *Empty State* (saat belum ada catatan), dan *Content*[cite: 520, 312].
 
-| Add Note | Note Detail | Edit Note |
-|:---:|:---:|:---:|
-| ![Add Note](link_gambar_add_note) | ![Note Detail](link_gambar_note_detail) | ![Edit Note](link_gambar_edit_note) |
+## 🗄️ Database Schema (SQLDelight)
 
-## 🗺️ Navigation Flow Diagram
-![Navigation Flow](link_gambar_diagram_flow)
+[cite_start]Aplikasi ini menggunakan SQLDelight untuk menghasilkan API Kotlin yang *type-safe* dari *query* SQL[cite: 166]. [cite_start]Berikut adalah skema tabel `Note` yang digunakan[cite: 204, 205, 206, 207, 208, 209, 210]:
 
-## 🎥 Video Demo (30 Detik)
-Video demonstrasi yang menunjukkan semua alur navigasi dapat dilihat pada tautan berikut:
-**[Tonton Video Demo di sini](https://drive.google.com/file/d/1UnAs8fvI0VvetaU7oNxArBhuxyv76ckN/view?usp=sharing)**
+```sql
+CREATE TABLE Note (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+);

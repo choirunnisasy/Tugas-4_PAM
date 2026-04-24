@@ -50,6 +50,7 @@ private val warmWhite   = Color(0xFFFFFDF9)
 // ─────────────────────────────────────────────────────────────────────────────
 // NEWS LIST SCREEN
 // ─────────────────────────────────────────────────────────────────────────────
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewsListScreen(
     viewModel: NewsViewModel,
