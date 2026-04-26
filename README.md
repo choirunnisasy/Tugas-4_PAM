@@ -10,7 +10,7 @@ Proyek ini dikembangkan untuk memenuhi **Tugas Minggu 7 - Pengembangan Aplikasi 
 
 ## ✨ Fitur Utama
 
-* **CRUD Operations:** Mendukung pembuatan (Create), pembacaan (Read), pembaruan (Update), dan penghapusan (Delete) catatan secara lokal[cite: 516].
+* **CRUD Operations:** Mendukung pembuatan (Create), pembacaan (Read), pembaruan (Update), dan penghapusan (Delete) catatan secara lokal.
 * **Smart Search:** Fitur pencarian *real-time* untuk menemukan catatan spesifik berdasarkan judul atau isi.
 * **User Preferences (DataStore):** Pengaturan personalisasi aplikasi seperti pilihan Tema (Light/Dark/System) dan urutan penyortiran catatan, disimpan dengan aman menggunakan `multiplatform-settings`.
 * **Offline-First Architecture:** Mengandalkan **SQLDelight** sebagai *Single Source of Truth*, memastikan pengalaman pengguna yang mulus tanpa jeda *network*.
@@ -29,7 +29,7 @@ Proyek ini dikembangkan untuk memenuhi **Tugas Minggu 7 - Pengembangan Aplikasi 
 
 ## 🎥 Video Demo (30 Detik)
 Video demonstrasi yang menunjukkan semua alur navigasi dapat dilihat pada tautan berikut:
-**[Tonton Video Demo di sini](https://drive.google.com/file/d/1UnAs8fvI0VvetaU7oNxArBhuxyv76ckN/view?usp=sharing)**
+**[Tonton Video Demo di sini](https://drive.google.com/file/d/1fmccy4MBGBwkvW_-Tz9FsaAXYkPvX981/view?usp=sharing)**
 
 ## 🗄️ Database Schema (SQLDelight)
 
@@ -43,7 +43,3 @@ CREATE TABLE Note (
     created_at INTEGER NOT NULL,
     updated_at INTEGER NOT NULL
 );
-
-## 🎥 Video Demo (30 Detik)
-Video demonstrasi yang menunjukkan semua alur navigasi dapat dilihat pada tautan berikut:
-**[Tonton Video Demo di sini](https://drive.google.com/file/d/1UnAs8fvI0VvetaU7oNxArBhuxyv76ckN/view?usp=sharing)**
