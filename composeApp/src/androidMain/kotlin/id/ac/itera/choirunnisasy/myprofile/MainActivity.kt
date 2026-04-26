@@ -11,6 +11,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
+        // Inisialisasi settings untuk Android
+        initAndroidSettings(this)
+
         setContent {
             App(DatabaseDriverFactory(this))
         }
