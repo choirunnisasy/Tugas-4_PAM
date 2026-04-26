@@ -77,15 +77,14 @@ import id.ac.itera.choirunnisasy.myprofile.component.ProfileTag
 import id.ac.itera.choirunnisasy.myprofile.component.SkillChip
 import id.ac.itera.choirunnisasy.myprofile.navigation.AppNavigation
 import id.ac.itera.choirunnisasy.myprofile.data.ProfileUiState
-import id.ac.itera.choirunnisasy.myprofile.db.DatabaseDriverFactory
-import com.russhwolf.settings.ExperimentalSettingsApi
 import kotlinx.coroutines.delay
+import org.koin.compose.KoinContext
 
-@OptIn(ExperimentalSettingsApi::class)
 @Composable
-fun App(driverFactory: DatabaseDriverFactory) {
-    val settings = remember { createSettings() }  // ← pakai expect/actual
-    AppNavigation(driverFactory, settings)
+fun App() {
+    KoinContext {
+        AppNavigation()
+    }
 }
 
 

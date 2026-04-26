@@ -44,6 +44,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation("io.ktor:ktor-client-android:2.3.9")
             implementation(libs.sqldelight.android)
+            implementation(libs.koin.android)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -66,6 +67,11 @@ kotlin {
             implementation(libs.settings.core)
             implementation(libs.settings.coroutines)
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
+
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+            implementation(libs.moko.permissions)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

@@ -8,7 +8,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
@@ -16,30 +15,17 @@ import id.ac.itera.choirunnisasy.myprofile.ProfileScreen
 import id.ac.itera.choirunnisasy.myprofile.ui.*
 import id.ac.itera.choirunnisasy.myprofile.screen.*
 import id.ac.itera.choirunnisasy.myprofile.viewmodel.*
-import id.ac.itera.choirunnisasy.myprofile.db.DatabaseDriverFactory
 import id.ac.itera.choirunnisasy.myprofile.data.*
-import id.ac.itera.choirunnisasy.myprofile.db.NotesDatabase
-import com.russhwolf.settings.ObservableSettings
-import com.russhwolf.settings.ExperimentalSettingsApi
+import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalSettingsApi::class)
 @Composable
-fun AppNavigation(
-    driverFactory: DatabaseDriverFactory,
-    settings: ObservableSettings  // ← tambah parameter ini
-) {
+fun AppNavigation() {
     val navController = rememberNavController()
 
-    val database = remember<NotesDatabase> { NotesDatabase(driverFactory.createDriver()) }
-    val repository = remember<NoteRepository> { NoteRepository(database) }
-
-    // Sekarang tinggal pakai settings yang di-inject
-    val settingsManager = remember { SettingsManager(settings) }
-
-    val profileViewModel: ProfileViewModel = viewModel<ProfileViewModel>()
-    val noteViewModel: NoteViewModel = viewModel<NoteViewModel> { NoteViewModel(repository, settingsManager) }
-    val newsViewModel: NewsViewModel = viewModel<NewsViewModel>()
-    val settingsViewModel: SettingsViewModel = viewModel<SettingsViewModel> { SettingsViewModel(settingsManager) }
+    val profileViewModel: ProfileViewModel = koinViewModel()
+    val noteViewModel: NoteViewModel = koinViewModel()
+    val newsViewModel: NewsViewModel = koinViewModel()
+    val settingsViewModel: SettingsViewModel = koinViewModel()
 
     val themeConfig by settingsViewModel.themeConfig.collectAsState(ThemeConfig.SYSTEM)
     val isDark = when (themeConfig) {

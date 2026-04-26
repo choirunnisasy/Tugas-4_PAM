@@ -24,6 +24,43 @@ import androidx.compose.ui.unit.sp
 import id.ac.itera.choirunnisasy.myprofile.*
 import id.ac.itera.choirunnisasy.myprofile.data.Note
 import id.ac.itera.choirunnisasy.myprofile.viewmodel.NoteViewModel
+import org.koin.compose.koinInject
+
+@Composable
+fun NetworkStatusIndicator() {
+    val networkMonitor: NetworkMonitor = koinInject()
+    val isConnected by networkMonitor.observeConnectivity().collectAsState(initial = true)
+
+    AnimatedVisibility(
+        visible = !isConnected,
+        enter = expandVertically() + fadeIn(),
+        exit = shrinkVertically() + fadeOut()
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(strawberry)
+                .padding(vertical = 4.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    Icons.Rounded.WifiOff,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    "Tidak ada koneksi internet",
+                    color = Color.White,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
+    }
+}
 
 @Composable
 fun NoteListScreen(
@@ -57,6 +94,8 @@ fun NoteListScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+            NetworkStatusIndicator()
+
             // ── Header ────────────────────────────────────────────
             Box(
                 modifier = Modifier
