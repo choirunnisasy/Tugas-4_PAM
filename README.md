@@ -1,49 +1,72 @@
-# Notes App - Offline First (KMP)
+# Notes App — Tugas Minggu 8 (Platform-Specific Features)
 
-- **Nama:** Choirunnisa
-- **NIM:** 123140136
-- **Mata Kuliah:** Pengembangan Aplikasi Mobile RB
+**IF25-22017 Pengembangan Aplikasi Mobile**
+Program Studi Teknik Informatika · Institut Teknologi Sumatera
 
-Aplikasi pencatatan (*Notes App*) berbasis **Kotlin Multiplatform (KMP)** yang dirancang dengan arsitektur *Offline-First*. Aplikasi ini memastikan data pengguna tetap aman dan dapat diakses kapan saja, tanpa bergantung pada koneksi internet, dengan mengusung antarmuka yang bersih, *minimalist*, dan *modern*.
+### Identitas Mahasiswa
+- **Nama**: Choirunnisa Syawaldina
+- **NIM**: 123140136
+- **Mata Kuliah**: Pengembangan Aplikasi Mobile RB
 
-Proyek ini dikembangkan untuk memenuhi **Tugas Minggu 7 - Pengembangan Aplikasi Mobile**.
+---
 
-## ✨ Fitur Utama
+### Deskripsi Tugas
+Proyek ini merupakan pembaruan (*upgrade*) dari Notes App (Tugas Minggu 7) dengan mengintegrasikan fitur-fitur spesifik platform (Android & iOS). Aplikasi KMP ini sekarang didukung penuh oleh **Koin Dependency Injection** dan memanfaatkan pola **expect/actual** untuk mengakses *Platform APIs* secara *native*.
 
-* **CRUD Operations:** Mendukung pembuatan (Create), pembacaan (Read), pembaruan (Update), dan penghapusan (Delete) catatan secara lokal[cite: 516].
-* **Smart Search:** Fitur pencarian *real-time* untuk menemukan catatan spesifik berdasarkan judul atau isi.
-* **User Preferences (DataStore):** Pengaturan personalisasi aplikasi seperti pilihan Tema (Light/Dark/System) dan urutan penyortiran catatan, disimpan dengan aman menggunakan `multiplatform-settings`.
-* **Offline-First Architecture:** Mengandalkan **SQLDelight** sebagai *Single Source of Truth*, memastikan pengalaman pengguna yang mulus tanpa jeda *network*.
-* **Reactive UI States:** Penanganan status layar yang responsif menggunakan `StateFlow` untuk transisi *Loading*, *Empty State* (saat belum ada catatan), dan *Content*.
+### ✨ Fitur yang Diimplementasikan
+Sesuai dengan instruksi tugas praktikum, seluruh fitur wajib dan bonus telah berhasil diintegrasikan:
+- [x] **Koin Dependency Injection**: Injeksi dependensi (DI) menggunakan Koin secara global untuk `ViewModel`, `Repository`, dan Service pendukung.
+- [x] **Network Monitor (expect/actual)**: Pemantauan status koneksi internet secara *real-time*.
+- [x] **Device Info (expect/actual)**: Pengambilan informasi OS dan model perangkat spesifik platform.
+- [x] **Network Status Indicator (UI)**: Indikator berupa *banner* berwarna merah yang muncul otomatis di *Main Screen* (layar utama) ketika koneksi internet terputus (Offline mode).
+- [x] **Device Info Display (UI)**: Menampilkan informasi perangkat secara dinamis pada halaman *Settings Screen*.
+- [x] **Runtime Permissions**: Pengelolaan dialog izin akses *native* platform (contoh: Izin Kamera/Lokasi) yang dapat dipicu dari halaman *Settings*.
+- [x] **BONUS FEATURE: Battery Info (expect/actual)**: Menampilkan status level (persentase) dan *charging* baterai secara *native*.
 
+---
+
+### 🏛️ Architecture Diagram (Koin DI & KMP)
+Berikut adalah diagram arsitektur yang mengilustrasikan pemisahan *layer* dan injeksi dependensi melalui modul Koin dalam ekosistem KMP:
+
+```text
+┌─────────────────────────────────────────────────────────────┐
+│                       KOIN APP MODULE                       │
+│                                                             │
+│  [Single] DatabaseDriverFactory  [Single] DeviceInfo        │
+│  [Single] NetworkMonitor         [Single] BatteryInfo       │
+│  [Single] NoteRepository         [Single] SettingsManager   │
+│                                                             │
+│  [ViewModelOf] NotesViewModel    [ViewModelOf] SettingsVM   │
+└─────────────────────────────┬───────────────────────────────┘
+                              │ Inject via koinViewModel() & koinInject()
+┌─────────────────────────────▼───────────────────────────────┐
+│                       COMMON UI LAYER                       │
+│                                                             │
+│  ┌────────────────────┐   ┌──────────────────────────────┐  │
+│  │ Main Screen        │   │ Settings Screen              │  │
+│  │ - Notes List       │   │ - Theme & Sort Preferences   │  │
+│  │ - NetworkIndicator │   │ - DeviceInfo & BatteryInfo   │  │
+│  └────────────────────┘   │ - Permission Action Button   │  │
+│                           └──────────────────────────────┘  │
+└─────────────────────────────┬───────────────────────────────┘
+                              │ calls / collects StateFlow
+┌─────────────────────────────▼───────────────────────────────┐
+│                    EXPECT/ACTUAL LAYER                      │
+│                                                             │
+│  [commonMain] expect classes (Network/Device/Battery)       │
+│      ├── [androidMain] actual class (Android APIs)          │
+│      └── [iosMain] actual class (iOS UIDevice APIs)         │
+└─────────────────────────────────────────────────────────────┘
+```
 ---
 ##  Screenshots Layar
 
-| Notes List | Empty State | Form Tambah |
+| Network Status Indicator | Device & Battery Info | Permission Dialog |
 |:---:|:---:|:---:|
-| ![Notes List](screenshots/Screenshot_20260426_182217.png) | ![Empty State](screenshots/Screenshot_20260426_181534.png) | ![From Tambah](screenshots/Screenshot_20260426_182250.png) |
+| ![Network Status Indicator](screenshots/Screenshot_20260426_202004.png) | ![Device & Battery Info](screenshots/Screenshot_20260426_202934.png) | ![Permission Dialog](screenshots/Screenshot_20260426_202646.png) |
 
-| Detail Catatan | Settings Screen |
-|:---:|:---:|:---:|
-| ![Detail Catatan](screenshots/Screenshot_20260426_182238.png) | ![Settings Screen](screenshots/Screenshot_20260426_184519.png) |
 
-## 🎥 Video Demo (30 Detik)
-Video demonstrasi yang menunjukkan semua alur navigasi dapat dilihat pada tautan berikut:
-**[Tonton Video Demo di sini](https://drive.google.com/file/d/1UnAs8fvI0VvetaU7oNxArBhuxyv76ckN/view?usp=sharing)**
+## 🎥 Video Demonstrasi
+Video demonstrasi di bawah ini memperlihatkan fungsionalitas utama: kelancaran aplikasi (bukti DI berjalan), pemantauan jaringan responsif dengan menyalakan Airplane Mode, serta tampilan Info Device, Baterai, dan Dialog Izin di halaman pengaturan.
 
-## 🗄️ Database Schema (SQLDelight)
-
-Aplikasi ini menggunakan SQLDelight untuk menghasilkan API Kotlin yang *type-safe* dari *query* SQL. [cite_start]Berikut adalah skema tabel `Note` yang digunakan:
-
-```sql
-CREATE TABLE Note (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    content TEXT NOT NULL,
-    created_at INTEGER NOT NULL,
-    updated_at INTEGER NOT NULL
-);
-
-## 🎥 Video Demo (30 Detik)
-Video demonstrasi yang menunjukkan semua alur navigasi dapat dilihat pada tautan berikut:
-**[Tonton Video Demo di sini](https://drive.google.com/file/d/1UnAs8fvI0VvetaU7oNxArBhuxyv76ckN/view?usp=sharing)**
+🔗**[Tonton Video Demo di sini](https://drive.google.com/file/d/1G1DoNkzLYy77E11gd0Gx7RmAElmbaCdl/view?usp=sharing)**
