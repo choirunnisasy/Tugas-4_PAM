@@ -28,3 +28,7 @@ CREATE TABLE Note (
     created_at INTEGER NOT NULL,
     updated_at INTEGER NOT NULL
 );
+
+## 🎥 Video Demo (30 Detik)
+Video demonstrasi yang menunjukkan semua alur navigasi dapat dilihat pada tautan berikut:
+**[Tonton Video Demo di sini](https://drive.google.com/file/d/1UnAs8fvI0VvetaU7oNxArBhuxyv76ckN/view?usp=sharing)**
