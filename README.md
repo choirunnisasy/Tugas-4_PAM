@@ -24,7 +24,7 @@ Proyek ini dikembangkan untuk memenuhi **Tugas Minggu 7 - Pengembangan Aplikasi 
 | ![Notes List](screenshots/Screenshot_20260426_182217.png) | ![Empty State](screenshots/Screenshot_20260426_181534.png) | ![From Tambah](screenshots/Screenshot_20260426_182250.png) |
 
 | Detail Catatan | Settings Screen |
-|:---:|:---:|:---:|
+|:---:|:---:|
 | ![Detail Catatan](screenshots/Screenshot_20260426_182238.png) | ![Settings Screen](screenshots/Screenshot_20260426_184519.png) |
 
 ## 🎥 Video Demo (30 Detik)
