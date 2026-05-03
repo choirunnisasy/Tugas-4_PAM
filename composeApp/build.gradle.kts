@@ -1,5 +1,6 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -8,6 +9,21 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.sqldelight)
+    id("com.github.gmazzo.buildconfig") version "5.5.0"
+}
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
+
+val geminiApiKey: String = localProperties.getProperty("GEMINI_API_KEY")?.trim() ?: ""
+
+buildConfig {
+    // Pastikan package name sama dengan yang di-import di AIRepository.kt
+    packageName("id.ac.itera.choirunnisasy.myprofile")
+    buildConfigField("GEMINI_API_KEY", geminiApiKey)
 }
 
 sqldelight {
@@ -45,6 +61,7 @@ kotlin {
             implementation("io.ktor:ktor-client-android:2.3.9")
             implementation(libs.sqldelight.android)
             implementation(libs.koin.android)
+            implementation(libs.moko.permissions)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -58,6 +75,7 @@ kotlin {
             implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10")
             implementation("io.ktor:ktor-client-core:2.3.9")
             implementation("io.ktor:ktor-client-content-negotiation:2.3.9")
+            implementation("io.ktor:ktor-client-logging:2.3.9")
             implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.9")
             implementation("media.kamel:kamel-image:0.9.3")
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
@@ -71,18 +89,18 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
-            implementation(libs.moko.permissions)
-        }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
+            // moko-permissions dihapus dari common agar build Desktop (JVM) tidak error
         }
         iosMain.dependencies {
             implementation(libs.sqldelight.native)
+            implementation("io.ktor:ktor-client-darwin:2.3.9")
+            implementation(libs.moko.permissions)
         }
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.sqldelight.jvm)
+            implementation("io.ktor:ktor-client-okhttp:2.3.9")
         }
     }
 }
@@ -116,16 +134,4 @@ android {
 
 dependencies {
     debugImplementation(libs.compose.ui.tooling)
-}
-
-compose.desktop {
-    application {
-        mainClass = "id.ac.itera.choirunnisasy.myprofile.MainKt"
-
-        nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "id.ac.itera.choirunnisasy.myprofile"
-            packageVersion = "1.0.0"
-        }
-    }
 }

@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -139,14 +140,6 @@ fun ProfileScreen(
                 ),
                 radius = 600f,
                 center = Offset(size.width * 0.95f, -80f)
-            )
-            drawCircle(
-                brush  = Brush.radialGradient(
-                    colors = listOf(strawberryPale.copy(alpha = bgAlpha * 0.7f), Color.Transparent),
-                    radius = 400f
-                ),
-                radius = 400f,
-                center = Offset(-60f, size.height * 0.85f)
             )
         }
 
@@ -409,45 +402,26 @@ private fun ProfileHeaderWithToggle(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(360.dp)
-            .clip(RoundedCornerShape(bottomStart = 56.dp, bottomEnd = 56.dp))
             .background(
                 Brush.linearGradient(
                     colors = headerColors,
                     start  = Offset(0f, 0f),
                     end    = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
                 )
-            ),
-        contentAlignment = Alignment.Center
+            )
     ) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            drawCircle(
-                color  = Color.White.copy(alpha = 0.07f),
-                radius = 180f,
-                center = Offset(size.width - 30f, -40f)
-            )
-            drawCircle(
-                color  = Color.White.copy(alpha = 0.05f),
-                radius = 100f,
-                center = Offset(40f, size.height - 30f)
-            )
-            listOf(
-                Offset(size.width * 0.15f, size.height * 0.25f),
-                Offset(size.width * 0.85f, size.height * 0.65f),
-                Offset(size.width * 0.70f, size.height * 0.15f),
-                Offset(size.width * 0.25f, size.height * 0.75f),
-            ).forEach {
-                drawCircle(color = Color.White.copy(alpha = 0.2f), radius = 4f, center = it)
-            }
-        }
-
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Spacer(modifier = Modifier.height(40.dp))
-
+        // Konten utama header yang menjorok dari status bar
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .statusBarsPadding()
+                .padding(bottom = 60.dp), 
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Row(
                 modifier              = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp),
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment     = Alignment.CenterVertically
             ) {
@@ -470,6 +444,8 @@ private fun ProfileHeaderWithToggle(
                 )
             }
 
+            Spacer(modifier = Modifier.height(12.dp))
+
             AnimatedVisibility(
                 visible = visible,
                 enter   = fadeIn(tween(800)) + scaleIn(tween(800), initialScale = 0.5f)
@@ -477,6 +453,16 @@ private fun ProfileHeaderWithToggle(
                 ProfilePhotoWidget()
             }
         }
+        
+        // Dekorasi Bulat di bagian bawah header agar menyatu dengan layar
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .height(40.dp)
+                .clip(RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp))
+                .background(if (isDark) darkBg else cream)
+        )
     }
 }
 

@@ -26,42 +26,7 @@ import id.ac.itera.choirunnisasy.myprofile.data.Note
 import id.ac.itera.choirunnisasy.myprofile.viewmodel.NoteViewModel
 import org.koin.compose.koinInject
 
-@Composable
-fun NetworkStatusIndicator() {
-    val networkMonitor: NetworkMonitor = koinInject()
-    val isConnected by networkMonitor.observeConnectivity().collectAsState(initial = true)
-
-    AnimatedVisibility(
-        visible = !isConnected,
-        enter = expandVertically() + fadeIn(),
-        exit = shrinkVertically() + fadeOut()
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(strawberry)
-                .padding(vertical = 4.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    Icons.Rounded.WifiOff,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    "Tidak ada koneksi internet",
-                    color = Color.White,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-        }
-    }
-}
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteListScreen(
     isDark: Boolean,
@@ -78,25 +43,9 @@ fun NoteListScreen(
 
     Scaffold(
         containerColor = bgColor,
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = onAddClick,
-                containerColor = matcha,
-                contentColor = Color.White,
-                shape = RoundedCornerShape(18.dp)
-            ) {
-                Icon(Icons.Rounded.Add, contentDescription = "Add Note")
-            }
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            NetworkStatusIndicator()
-
-            // ── Header ────────────────────────────────────────────
+        contentWindowInsets = WindowInsets(0, 0, 0, 0), // Full edge-to-edge
+        topBar = {
+            // Header Full menembus Status Bar
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -108,32 +57,46 @@ fun NoteListScreen(
                                 listOf(matchaDeep, matcha)
                         )
                     )
-                    .statusBarsPadding()
-                    .padding(horizontal = 20.dp, vertical = 24.dp)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text(
-                            text = "My Notes 📝",
-                            fontSize = 26.sp,
-                            fontWeight = FontWeight.Black,
-                            color = Color.White
-                        )
-                        Text(
-                            text = "${filteredNotes.size} catatan",
-                            fontSize = 13.sp,
-                            color = Color.White.copy(alpha = 0.7f)
-                        )
-                    }
-                    IconButton(onClick = onSettingsClick) {
-                        Icon(Icons.Rounded.Settings, contentDescription = "Settings", tint = Color.White)
-                    }
-                }
+                TopAppBar(
+                    title = {
+                        Column {
+                            Text(
+                                text = "My Notes 📝",
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Black,
+                                color = Color.White
+                            )
+                            Text(
+                                text = "${filteredNotes.size} catatan",
+                                fontSize = 12.sp,
+                                color = Color.White.copy(alpha = 0.7f)
+                            )
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = onSettingsClick) {
+                            Icon(Icons.Rounded.Settings, contentDescription = "Settings", tint = Color.White)
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent,
+                        titleContentColor = Color.White,
+                        actionIconContentColor = Color.White
+                    ),
+                    windowInsets = TopAppBarDefaults.windowInsets
+                )
             }
+        }
+        // Tombol FAB dihapus dari sini karena sudah ditangani di AppNavigation
+        // agar tombol Chat (kiri) dan Tambah Note (kanan) bisa sejajar.
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = paddingValues.calculateTopPadding()) // Menghindari tumpang tindih dengan TopBar
+        ) {
+            NetworkStatusIndicator()
 
             // ── Search Bar ────────────────────────────────────────
             OutlinedTextField(
@@ -167,8 +130,9 @@ fun NoteListScreen(
                 EmptyNotesState(isDark)
             } else {
                 LazyColumn(
-                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 80.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 100.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.fillMaxSize()
                 ) {
                     items(filteredNotes, key = { it.id }) { note ->
                         NoteCard(
@@ -186,10 +150,7 @@ fun NoteListScreen(
 
 @Composable
 fun EmptyNotesState(isDark: Boolean) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = "🍵", fontSize = 48.sp)
             Spacer(modifier = Modifier.height(12.dp))
@@ -199,72 +160,38 @@ fun EmptyNotesState(isDark: Boolean) {
                 fontWeight = FontWeight.SemiBold,
                 color = if (isDark) darkSubtext else Color(0xFF999999)
             )
-            Text(
-                text = "Tap + untuk tambah catatan baru",
-                fontSize = 13.sp,
-                color = if (isDark) darkSubtext else Color(0xFFAAAAAA)
-            )
         }
     }
 }
 
 @Composable
-fun NoteCard(
-    note: Note,
-    isDark: Boolean,
-    onClick: () -> Unit,
-    onFavorite: () -> Unit
-) {
+fun NoteCard(note: Note, isDark: Boolean, onClick: () -> Unit, onFavorite: () -> Unit) {
     val cardColor = if (isDark) darkCard else warmWhite
-
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
+        modifier = Modifier.fillMaxWidth().clickable { onClick() },
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = cardColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(matchaPale),
+                modifier = Modifier.size(48.dp).clip(RoundedCornerShape(14.dp)).background(matchaPale),
                 contentAlignment = Alignment.Center
-            ) {
-                Text(text = note.emoji, fontSize = 22.sp)
-            }
+            ) { Text(text = note.emoji, fontSize = 22.sp) }
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = note.title,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (isDark) darkText else charcoal,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Spacer(modifier = Modifier.height(3.dp))
-                Text(
-                    text = note.content,
-                    fontSize = 13.sp,
-                    color = if (isDark) darkSubtext else Color(0xFF888888),
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Text(text = note.title, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = if (isDark) darkText else charcoal, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(text = note.content, fontSize = 13.sp, color = if (isDark) darkSubtext else Color(0xFF888888), maxLines = 2, overflow = TextOverflow.Ellipsis)
             }
 
             IconButton(onClick = onFavorite) {
                 Icon(
                     imageVector = if (note.isFavorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
-                    contentDescription = "Favorite",
+                    contentDescription = null,
                     tint = if (note.isFavorite) strawberry else Color(0xFFCCCCCC)
                 )
             }

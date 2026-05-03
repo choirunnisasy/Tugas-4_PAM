@@ -6,8 +6,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
@@ -16,6 +18,7 @@ import id.ac.itera.choirunnisasy.myprofile.ui.*
 import id.ac.itera.choirunnisasy.myprofile.screen.*
 import id.ac.itera.choirunnisasy.myprofile.viewmodel.*
 import id.ac.itera.choirunnisasy.myprofile.data.*
+import id.ac.itera.choirunnisasy.myprofile.matcha
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -35,6 +38,7 @@ fun AppNavigation() {
     }
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route
@@ -60,9 +64,46 @@ fun AppNavigation() {
                     )
                 }
             }
-        }
+        },
+        floatingActionButton = {
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentRoute = navBackStackEntry?.destination?.route
+            if (currentRoute == Screen.Notes.route) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 32.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Tombol Chat di Kiri
+                    FloatingActionButton(
+                        onClick = { navController.navigate(Screen.Chat.route) },
+                        containerColor = matcha,
+                        contentColor = Color.White
+                    ) {
+                        Icon(Icons.Rounded.Chat, contentDescription = "AI Chat")
+                    }
+
+                    // Tombol Tambah Note di Kanan
+                    FloatingActionButton(
+                        onClick = { navController.navigate(Screen.AddNote.route) },
+                        containerColor = matcha,
+                        contentColor = Color.White,
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(18.dp)
+                    ) {
+                        Icon(Icons.Rounded.Add, contentDescription = "Add Note")
+                    }
+                }
+            }
+        },
+        floatingActionButtonPosition = FabPosition.Center
     ) { padding ->
-        NavHost(navController, Screen.Notes.route, Modifier.padding(padding)) {
+        NavHost(
+            navController = navController,
+            startDestination = Screen.Notes.route,
+            modifier = Modifier.padding(bottom = padding.calculateBottomPadding())
+        ) {
             composable(Screen.Notes.route) {
                 NoteListScreen(
                     isDark = isDark,
@@ -94,6 +135,9 @@ fun AppNavigation() {
                 SettingsScreen(settingsViewModel) {
                     navController.popBackStack()
                 }
+            }
+            composable(Screen.Chat.route) {
+                ChatScreen(onBack = { navController.popBackStack() })
             }
             composable(Screen.NewsList.route) {
                 NewsListScreen(newsViewModel, isDark, { navController.popBackStack() }) { id ->

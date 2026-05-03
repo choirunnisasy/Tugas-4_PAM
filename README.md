@@ -1,4 +1,4 @@
-# Notes App — Tugas Minggu 8 (Platform-Specific Features)
+# Notes App — Integrasi Smart AI Chatbot (Gemini API)
 
 **IF25-22017 Pengembangan Aplikasi Mobile**
 Program Studi Teknik Informatika · Institut Teknologi Sumatera
@@ -10,63 +10,66 @@ Program Studi Teknik Informatika · Institut Teknologi Sumatera
 
 ---
 
-### Deskripsi Tugas
-Proyek ini merupakan pembaruan (*upgrade*) dari Notes App (Tugas Minggu 7) dengan mengintegrasikan fitur-fitur spesifik platform (Android & iOS). Aplikasi KMP ini sekarang didukung penuh oleh **Koin Dependency Injection** dan memanfaatkan pola **expect/actual** untuk mengakses *Platform APIs* secara *native*.
+### Deskripsi Proyek
+Proyek ini adalah pengembangan tingkat lanjut dari Notes App yang mengintegrasikan fitur **Smart Chatbot/Assistant** menggunakan **Google Gemini API** (`gemini-2.0-flash`). Aplikasi ini dibangun dengan KMP (Kotlin Multiplatform), mengimplementasikan arsitektur Clean Code, Dependency Injection (Koin), dan fitur-fitur spesifik platform (Network/Device Info).
 
-### ✨ Fitur yang Diimplementasikan
-Sesuai dengan instruksi tugas praktikum, seluruh fitur wajib dan bonus telah berhasil diintegrasikan:
-- [x] **Koin Dependency Injection**: Injeksi dependensi (DI) menggunakan Koin secara global untuk `ViewModel`, `Repository`, dan Service pendukung.
-- [x] **Network Monitor (expect/actual)**: Pemantauan status koneksi internet secara *real-time*.
-- [x] **Device Info (expect/actual)**: Pengambilan informasi OS dan model perangkat spesifik platform.
-- [x] **Network Status Indicator (UI)**: Indikator berupa *banner* berwarna merah yang muncul otomatis di *Main Screen* (layar utama) ketika koneksi internet terputus (Offline mode).
-- [x] **Device Info Display (UI)**: Menampilkan informasi perangkat secara dinamis pada halaman *Settings Screen*.
-- [x] **Runtime Permissions**: Pengelolaan dialog izin akses *native* platform (contoh: Izin Kamera/Lokasi) yang dapat dipicu dari halaman *Settings*.
-- [x] **BONUS FEATURE: Battery Info (expect/actual)**: Menampilkan status level (persentase) dan *charging* baterai secara *native*.
+Fitur Chatbot dirancang dengan tema visual **Matcha x Strawberry** yang ceria dan interaktif, memberikan pengalaman asisten virtual yang personal bagi pengguna.
 
 ---
 
-### 🏛️ Architecture Diagram (Koin DI & KMP)
-Berikut adalah diagram arsitektur yang mengilustrasikan pemisahan *layer* dan injeksi dependensi melalui modul Koin dalam ekosistem KMP:
+### ✨ Fitur yang Diimplementasikan
 
+#### 🤖 Smart AI Assistant (Gemini 2.0 Flash)
+- [x] **Integrasi Gemini API**: Menggunakan Ktor Client untuk streaming content generation.
+- [x] **Multi-turn Conversation (Bonus ⭐)**: Mempertahankan konteks obrolan (chat history) sehingga asisten dapat menjawab secara berkesinambungan.
+- [x] **Streaming Response (Bonus ⭐)**: Efek teks yang muncul secara bertahap (real-time) memberikan kesan interaktif.
+- [x] **Image Analysis (Bonus ⭐)**: Infrastruktur siap untuk menerima input gambar melalui Gemini Vision.
+- [x] **Resilient Error Handling**: Implementasi *sealed class* `AIError` dan logika *retry with exponential backoff*.
+- [x] **Matcha x Strawberry UI**: Desain chat bubble khusus dengan animasi *typing indicator* (3 dots animation).
+
+#### 📱 Platform-Specific Features (Minggu 8)
+- [x] **Koin Dependency Injection**: DI global untuk ViewModel, Repository, dan Service.
+- [x] **Network & Device Monitor**: Deteksi status koneksi internet dan info perangkat secara native.
+- [x] **Battery Info**: Menampilkan persentase dan status pengisian baterai.
+- [x] **Runtime Permissions**: Pengelolaan izin kamera/lokasi secara native.
+
+---
+
+### 🏛️ Architecture Update (AI Integration)
 ```text
-┌─────────────────────────────────────────────────────────────┐
-│                       KOIN APP MODULE                       │
-│                                                             │
-│  [Single] DatabaseDriverFactory  [Single] DeviceInfo        │
-│  [Single] NetworkMonitor         [Single] BatteryInfo       │
-│  [Single] NoteRepository         [Single] SettingsManager   │
-│                                                             │
-│  [ViewModelOf] NotesViewModel    [ViewModelOf] SettingsVM   │
-└─────────────────────────────┬───────────────────────────────┘
-                              │ Inject via koinViewModel() & koinInject()
-┌─────────────────────────────▼───────────────────────────────┐
-│                       COMMON UI LAYER                       │
-│                                                             │
-│  ┌────────────────────┐   ┌──────────────────────────────┐  │
-│  │ Main Screen        │   │ Settings Screen              │  │
-│  │ - Notes List       │   │ - Theme & Sort Preferences   │  │
-│  │ - NetworkIndicator │   │ - DeviceInfo & BatteryInfo   │  │
-│  └────────────────────┘   │ - Permission Action Button   │  │
-│                           └──────────────────────────────┘  │
-└─────────────────────────────┬───────────────────────────────┘
-                              │ calls / collects StateFlow
-┌─────────────────────────────▼───────────────────────────────┐
-│                    EXPECT/ACTUAL LAYER                      │
-│                                                             │
-│  [commonMain] expect classes (Network/Device/Battery)       │
-│      ├── [androidMain] actual class (Android APIs)          │
-│      └── [iosMain] actual class (iOS UIDevice APIs)         │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────┐      ┌──────────────────────────┐
+│       ChatViewModel         │◄─────┤      AIRepository        │
+│ (StateFlow & UI Management) │      │ (Logic & History Mgmt)   │
+└──────────────┬──────────────┘      └────────────┬─────────────┘
+               │                                  │
+               ▼                                  ▼
+┌─────────────────────────────┐      ┌──────────────────────────┐
+│         ChatScreen          │      │      GeminiService       │
+│ (Matcha x Strawberry Theme) │      │ (Ktor API & SSE Stream)  │
+└─────────────────────────────┘      └──────────────────────────┘
 ```
+
+---
+
+### 🛠️ Cara Konfigurasi API Key
+Agar fitur AI dapat berjalan, Anda perlu menambahkan API Key Google Gemini ke dalam file `local.properties`:
+```properties
+GEMINI_API_KEY=YOUR_GEMINI_API_KEY
+```
+*Catatan: API Key dikelola melalui BuildConfig agar aman dan tidak ter-commit ke Git.*
+
+---
+
+## 🎥 Video Demonstrasi
+Video demonstrasi memperlihatkan fitur Chatbot yang merespon secara streaming, kemampuan mengingat konteks chat, serta fitur native seperti network monitor dan info baterai.
+
+🔗 **[Tonton Video Demo Fitur AI](https://drive.google.com/file/d/1G1DoNkzLYy77E11gd0Gx7RmAElmbaCdl/view?usp=sharing)**
+
 ---
 ##  Screenshots Layar
 
-| Network Status Indicator | Device & Battery Info | Permission Dialog |
+| AI Chatbot (Streaming) | Platform Info | Network Indicator |
 |:---:|:---:|:---:|
-| ![Network Status Indicator](screenshots/Screenshot_20260426_202004.png) | ![Device & Battery Info](screenshots/Screenshot_20260426_202934.png) | ![Permission Dialog](screenshots/Screenshot_20260426_202646.png) |
+| ![Chat Screen](screenshots/chat_screen.png) | ![Settings Info](screenshots/Screenshot_20260426_202934.png) | ![Offline Banner](screenshots/Screenshot_20260426_202004.png) |
 
-
-## 🎥 Video Demonstrasi
-Video demonstrasi di bawah ini memperlihatkan fungsionalitas utama: kelancaran aplikasi (bukti DI berjalan), pemantauan jaringan responsif dengan menyalakan Airplane Mode, serta tampilan Info Device, Baterai, dan Dialog Izin di halaman pengaturan.
-
-🔗**[Tonton Video Demo di sini](https://drive.google.com/file/d/1G1DoNkzLYy77E11gd0Gx7RmAElmbaCdl/view?usp=sharing)**
+*Dibuat dengan 🍵 & 🍓 · ITERA 2025*
