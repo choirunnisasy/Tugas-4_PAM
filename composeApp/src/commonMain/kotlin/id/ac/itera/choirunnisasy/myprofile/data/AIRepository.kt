@@ -7,14 +7,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onCompletion
-import io.ktor.client.plugins.*
-
-sealed class AIError : Exception() {
-    object NetworkError : AIError()
-    object Unauthorized : AIError()
-    object RateLimited : AIError()
-    data class Unknown(val msg: String) : AIError()
-}
 
 interface AIRepository {
     val messages: StateFlow<List<ChatMessage>>
@@ -47,20 +39,35 @@ class AIRepositoryImpl(private val geminiService: GeminiService) : AIRepository 
         val streamingMessage = ChatMessage(MessageRole.MODEL, "", isStreaming = true)
         _messages.value += streamingMessage
 
-        retryWithBackoff(retries = 2) {
-            val history = _messages.value.filter { !it.isStreaming }.map { msg ->
+        try {
+            val chatHistory = _messages.value.filter { !it.isStreaming && !it.isError }
+            
+            val contents = chatHistory.mapIndexed { index, msg ->
+                val parts = mutableListOf<Part>()
+                
+                // Masukkan instruksi Matcha-chan ke pesan pertama agar aman dari error "Unknown name"
+                val processedText = if (index == 0) {
+                    "$systemPrompt\n\nUser: ${msg.text}"
+                } else {
+                    msg.text
+                }
+                
+                if (processedText.isNotBlank()) {
+                    parts.add(Part(text = processedText))
+                }
+                
+                msg.imageBase64?.let { 
+                    parts.add(Part(inlineData = InlineData("image/jpeg", it)))
+                }
+
                 Content(
                     role = if (msg.role == MessageRole.USER) "user" else "model",
-                    parts = listOfNotNull(
-                        msg.text.let { Part(text = it) },
-                        msg.imageBase64?.let { Part(inlineData = InlineData("image/jpeg", it)) }
-                    )
+                    parts = parts
                 )
             }
 
             val request = GeminiRequest(
-                contents = history,
-                systemInstruction = Content(parts = listOf(Part(text = systemPrompt))),
+                contents = contents,
                 generationConfig = GenerationConfig(temperature = 0.7)
             )
 
@@ -69,46 +76,54 @@ class AIRepositoryImpl(private val geminiService: GeminiService) : AIRepository 
                 val chunk = response.candidates?.firstOrNull()?.content?.parts?.firstOrNull()?.text ?: ""
                 fullResponse += chunk
                 
-                val currentList = _messages.value.toMutableList()
-                if (currentList.isNotEmpty() && currentList.last().isStreaming) {
-                    currentList[currentList.size - 1] = currentList.last().copy(text = fullResponse)
-                    _messages.value = currentList
-                }
+                updateStreamingMessage(fullResponse)
                 emit(fullResponse)
             }
             
-            val finalList = _messages.value.toMutableList()
-            if (finalList.isNotEmpty() && finalList.last().isStreaming) {
-                finalList[finalList.size - 1] = finalList.last().copy(text = fullResponse, isStreaming = false)
-                _messages.value = finalList
-            }
+            finalizeStreamingMessage(fullResponse)
+        } catch (e: Exception) {
+            handleError(e)
+            throw e
         }
-    }.onCompletion { cause ->
-        if (cause != null && cause !is kotlinx.coroutines.CancellationException) {
-            val currentList = _messages.value.toMutableList()
-            if (currentList.isNotEmpty() && currentList.last().isStreaming) {
-                currentList.removeAt(currentList.size - 1)
-            }
-            // Pesan error sangat singkat sesuai permintaan
-            currentList.add(ChatMessage(MessageRole.MODEL, "Error! 🍓", isError = true))
+    }
+
+    private fun updateStreamingMessage(text: String) {
+        val currentList = _messages.value.toMutableList()
+        if (currentList.isNotEmpty() && currentList.last().isStreaming) {
+            currentList[currentList.size - 1] = currentList.last().copy(text = text)
             _messages.value = currentList
         }
+    }
+
+    private fun finalizeStreamingMessage(text: String) {
+        val currentList = _messages.value.toMutableList()
+        if (currentList.isNotEmpty() && currentList.last().isStreaming) {
+            currentList[currentList.size - 1] = currentList.last().copy(text = text, isStreaming = false)
+            _messages.value = currentList
+        }
+    }
+
+    private fun handleError(e: Exception) {
+        val currentList = _messages.value.toMutableList()
+        if (currentList.isNotEmpty() && currentList.last().isStreaming) {
+            currentList.removeAt(currentList.size - 1)
+        }
+        val errorMsg = e.message ?: "Koneksi terputus"
+        currentList.add(ChatMessage(MessageRole.MODEL, "Gagal: $errorMsg 🍓", isError = true))
+        _messages.value = currentList
     }
 
     private suspend fun <T> retryWithBackoff(
         retries: Int,
         initialDelay: Long = 1000,
-        maxDelay: Long = 4000,
-        factor: Double = 2.0,
         block: suspend () -> T
     ): T {
         var currentDelay = initialDelay
-        repeat(retries - 1) {
-            try {
-                return block()
-            } catch (e: Exception) {
+        repeat(retries) { attempt ->
+            try { return block() } catch (e: Exception) {
+                if (attempt == retries - 1) throw e
                 delay(currentDelay)
-                currentDelay = (currentDelay * factor).toLong().coerceAtMost(maxDelay)
+                currentDelay *= 2
             }
         }
         return block()

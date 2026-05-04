@@ -12,19 +12,36 @@ import kotlinx.serialization.json.Json
 import io.ktor.utils.io.*
 
 class GeminiService(private val client: HttpClient) {
+    
+    companion object {
+        // Menggunakan gemini-2.5-flash sesuai permintaan.
+        // Jika muncul error 429 (Limit 0), berarti model ini belum tersedia untuk akun Anda.
+        private const val MODEL_NAME = "gemini-2.5-flash"
+        private const val HOST = "generativelanguage.googleapis.com"
+    }
+
     private val apiKey = BuildConfig.GEMINI_API_KEY
-    // Menggunakan gemini-2.0-flash
-    private val modelName = "gemini-2.0-flash"
-    private val streamUrl = "https://generativelanguage.googleapis.com/v1beta/models/$modelName:streamGenerateContent"
 
     fun streamGenerateContent(request: GeminiRequest): Flow<GeminiResponse> = flow {
-        client.preparePost("$streamUrl?key=$apiKey&alt=sse") {
+        if (apiKey.isBlank()) {
+            throw Exception("API Key kosong! Periksa local.properties.")
+        }
+
+        client.preparePost {
+            url {
+                protocol = URLProtocol.HTTPS
+                host = HOST
+                // Menggunakan v1beta untuk mendukung model terbaru/preview
+                encodedPath = "/v1beta/models/$MODEL_NAME:streamGenerateContent"
+                parameters.append("key", apiKey)
+                parameters.append("alt", "sse")
+            }
             contentType(ContentType.Application.Json)
             setBody(request)
         }.execute { response ->
             if (response.status != HttpStatusCode.OK) {
-                // Lempar kode error untuk ditangkap AIRepository
-                throw Exception("${response.status.value}")
+                val errorBody = response.bodyAsText()
+                throw Exception("Google AI Error (HTTP ${response.status.value}): $errorBody")
             }
             
             val channel = response.bodyAsChannel()
@@ -34,7 +51,14 @@ class GeminiService(private val client: HttpClient) {
                     val jsonString = line.substring(6).trim()
                     if (jsonString.isNotEmpty()) {
                         try {
-                            val geminiResponse = Json { ignoreUnknownKeys = true }.decodeFromString<GeminiResponse>(jsonString)
+                            val geminiResponse = Json { 
+                                ignoreUnknownKeys = true 
+                            }.decodeFromString<GeminiResponse>(jsonString)
+                            
+                            if (geminiResponse.error != null) {
+                                throw Exception(geminiResponse.error.message)
+                            }
+                            
                             emit(geminiResponse)
                         } catch (e: Exception) { }
                     }
