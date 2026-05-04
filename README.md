@@ -61,15 +61,15 @@ GEMINI_API_KEY=YOUR_GEMINI_API_KEY
 ---
 
 ## 🎥 Video Demonstrasi
-Video demonstrasi memperlihatkan fitur Chatbot yang merespon secara streaming, kemampuan mengingat konteks chat, serta fitur native seperti network monitor dan info baterai.
+Video demonstrasi memperlihatkan fitur Chatbot yang merespon secara streaming dan kemampuan mengingat konteks chat.
 
-🔗 **[Tonton Video Demo Fitur AI](https://drive.google.com/file/d/1G1DoNkzLYy77E11gd0Gx7RmAElmbaCdl/view?usp=sharing)**
+🔗 **[Tonton Video Demo Fitur AI](https://drive.google.com/file/d/1ApIUR_kP36NE5QXqZvFiPtDuSsdMidxM/view?usp=sharing)**
 
 ---
 ##  Screenshots Layar
 
-| AI Chatbot (Streaming) | Platform Info | Network Indicator |
-|:---:|:---:|:---:|
-| ![Chat Screen](screenshots/chat_screen.png) | ![Settings Info](screenshots/Screenshot_20260426_202934.png) | ![Offline Banner](screenshots/Screenshot_20260426_202004.png) |
+| AI Chatbot (Streaming) | 
+|:---:|
+| ![Chat Screen](screenshots/Screenshot_20260504_223454.png) | 
 
 *Dibuat dengan 🍵 & 🍓 · ITERA 2025*
