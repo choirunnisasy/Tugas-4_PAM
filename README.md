@@ -43,9 +43,9 @@ Implementasi arsitektur **Clean Code**, **Koin Dependency Injection (DI)**, dan 
 
 ---
 
-## 📊 Test Coverage Report 
+## Test Coverage Report 
 
-![Test Coverage Screenshot](screenshots/Screenshot 2026-05-10 211159.png)
+![Test Coverage Screenshot](screenshots/Screenshot_2026-05-10_211159.png)
 
 ---
 
@@ -56,10 +56,10 @@ Video ini mendemonstrasikan proses eksekusi "Run All Tests" yang menunjukkan sel
 
 ---
 
-### ✨ Fitur yang Diimplementasikan (Summary)
+### Fitur yang Diimplementasikan (Summary)
 - **Smart AI Assistant**: Streaming response & multi-turn conversation dengan Gemini API.
 - **Notes Management**: CRUD catatan dengan database lokal menggunakan SQLDelight.
 - **Platform Specific**: Deteksi status baterai dan koneksi jaringan.
 - **Clean Architecture**: Implementasi Dependency Injection dengan Koin.
 
-*Dibuat dengan 🍵 & 🍓 · ITERA 2025*
+*Dibuat dengan 🍵 & 🍓 · ITERA 2026*
