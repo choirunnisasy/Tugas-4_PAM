@@ -5,7 +5,7 @@
 
 ---
 
-## 👩‍Identitas Mahasiswa
+## Identitas Mahasiswa
 - **Nama**: Choirunnisa Syawaldina
 - **NIM**: 123140136
 - **Kelas**: Pengembangan Aplikasi Mobile RB
@@ -52,7 +52,7 @@ Implementasi arsitektur **Clean Code**, **Koin Dependency Injection (DI)**, dan 
 ## 🎬 Video Demo (45 Detik)
 Video ini mendemonstrasikan proses eksekusi "Run All Tests" yang menunjukkan seluruh *test cases* berhasil (*Passed*) beserta hasil persentase *coverage*-nya.
 
-👉 **[Tonton Video Demo di Sini](https://drive.google.com/file/d/1efPznDmTDCBqY9zycDz4PoJLTybc7OSL/view?usp=sharing)**
+**[Tonton Video Demo di Sini](https://drive.google.com/file/d/1efPznDmTDCBqY9zycDz4PoJLTybc7OSL/view?usp=sharing)**
 
 ---
 
