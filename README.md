@@ -1,39 +1,58 @@
-# Notes App — Integrasi Smart AI Chatbot (Gemini API)
+# Tugas Pertemuan 10: Testing & Dependency Injection
 
-### 📖 Deskripsi Tugas
-Proyek ini adalah pengembangan aplikasi catatan (Notes App) yang mengintegrasikan Google Gemini AI untuk membantu pengguna dalam mengelola catatan secara cerdas. Fokus pengumpulan minggu ini adalah penerapan pengujian perangkat lunak mencakup Unit Testing pada Repository dan ViewModel, serta UI Testing menggunakan Compose Test Rule untuk memastikan aplikasi bebas dari bug dan memiliki coverage kode yang baik.
+**Mata Kuliah:** Pengembangan Aplikasi Mobile  
+**Program Studi:** Teknik Informatika - Institut Teknologi Sumatera
 
-### 📝 Identitas Mahasiswa
+---
+
+## 👩‍Identitas Mahasiswa
 - **Nama**: Choirunnisa Syawaldina
 - **NIM**: 123140136
 - **Kelas**: Pengembangan Aplikasi Mobile RB
 
 ---
 
-### ✅ Daftar Test Cases
-Berikut adalah daftar **12 test cases** yang telah diuji dan dinyatakan **Passed**:
-
-| Komponen | Skenario Pengujian | Jumlah | Status |
-| :--- | :--- | :---: | :---: |
-| **Repository** | Pengujian database local (Insert, Delete, Get by ID, Toggle Favorite) | 5 | ✅ Passed |
-| **ViewModel** | Pengujian logika bisnis, StateFlow, dan interaksi dengan Repository | 4 | ✅ Passed |
-| **UI (Instrumented)**| Pengujian komponen UI Compose, Input Fields, dan List Rendering | 3 | ✅ Passed |
-| **Total Passed** | | **12** | |
+## Deskripsi Proyek
+Implementasi arsitektur **Clean Code**, **Koin Dependency Injection (DI)**, dan **Automated Testing** pada Notes App. Proyek ini mengedepankan kualitas kode dengan menerapkan pola AAA (Arrange, Act, Assert) pada pengujian secara menyeluruh untuk memastikan aplikasi berjalan stabil.
 
 ---
 
-### 📊 Screenshot Test Coverage
-Berikut adalah bukti persentase kode yang ter-cover oleh pengujian:
+## ✅ Daftar Test Cases (Total: 14 Tests Passed)
 
-![Test Coverage](screenshots/test_coverage.png)
-*(Catatan: Jika coverage tidak muncul, pastikan Anda menjalankan 'Run with Coverage' pada target Android)*
+### 1. NoteRepository (5 Test Cases)
+- `[x]` Mengembalikan daftar catatan kosong pada inisialisasi awal.
+- `[x]` Berhasil menyimpan catatan baru yang valid ke dalam database.
+- `[x]` Memunculkan *exception* (gagal) ketika menyimpan catatan dengan judul kosong.
+- `[x]` Berhasil menghapus catatan spesifik berdasarkan ID.
+- `[x]` Berhasil mengambil data satu catatan spesifik berdasarkan ID.
+
+### 2. NotesViewModel dengan MockK (4 Test Cases)
+- `[x]` Memanggil fungsi `insertNote` di *repository* ketika `addNote` dieksekusi.
+- `[x]` Memanggil fungsi `deleteNote` di *repository* ketika `deleteNote` dieksekusi.
+- `[x]` Memastikan UI State memperbarui data secara reaktif setelah menambahkan catatan.
+- `[x]` Memastikan UI State memperbarui data secara reaktif setelah menghapus catatan.
+
+### 3. Flow Test dengan Turbine (2 Test Cases)
+- `[x]` *State* awal memancarkan (emit) `Loading`, kemudian berubah menjadi `Success` saat data berhasil dimuat.
+- `[x]` *State* berubah menjadi `Error` ketika *repository* mengembalikan kegagalan/exception.
+
+### 4. UI Test Compose (3 Test Cases)
+- `[x]` Menampilkan *Empty State Message* ("Belum ada catatan") saat daftar catatan masih kosong.
+- `[x]` Menyimulasikan input teks pada *TextField* dan menekan tombol tambah dengan sukses.
+- `[x]` Memastikan *item* catatan yang baru ditambahkan benar-benar *rendered* dan tampil di layar.
 
 ---
 
-### 🎥 Link Video Demo (45 Detik)
-Video ini mendemonstrasikan fitur utama aplikasi termasuk integrasi Gemini AI dan hasil pengujian.
+## 📊 Test Coverage Report 
 
-🔗 **[Tonton Video Demo (45 Detik)](https://drive.google.com/file/d/1ApIUR_kP36NE5QXqZvFiPtDuSsdMidxM/view?usp=sharing)**
+![Test Coverage Screenshot](screenshots/Screenshot 2026-05-10 211159.png)
+
+---
+
+## 🎬 Video Demo (45 Detik)
+Video ini mendemonstrasikan proses eksekusi "Run All Tests" yang menunjukkan seluruh *test cases* berhasil (*Passed*) beserta hasil persentase *coverage*-nya.
+
+👉 **[Tonton Video Demo di Sini](https://drive.google.com/file/d/1efPznDmTDCBqY9zycDz4PoJLTybc7OSL/view?usp=sharing)**
 
 ---
 
