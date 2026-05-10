@@ -39,6 +39,8 @@ class NoteViewModel(
             searchQuery = query,
             isLoading = false
         )
+    }.catch { e ->
+        emit(NoteUiState(errorMessage = e.message, isLoading = false))
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), NoteUiState(isLoading = true))
 
     fun onSearchChange(query: String) {
@@ -47,13 +49,21 @@ class NoteViewModel(
 
     fun addNote(title: String, content: String, emoji: String = "📝") {
         viewModelScope.launch {
-            repository.insertNote(title, content, emoji)
+            try {
+                repository.insertNote(title, content, emoji)
+            } catch (e: Exception) {
+                // Error handling can be added here as well
+            }
         }
     }
 
     fun updateNote(id: Int, title: String, content: String, emoji: String, isFavorite: Boolean) {
         viewModelScope.launch {
-            repository.updateNote(id.toLong(), title, content, emoji, isFavorite)
+            try {
+                repository.updateNote(id.toLong(), title, content, emoji, isFavorite)
+            } catch (e: Exception) {
+                // Error handling can be added here
+            }
         }
     }
 

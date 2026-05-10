@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -43,9 +44,8 @@ fun NoteListScreen(
 
     Scaffold(
         containerColor = bgColor,
-        contentWindowInsets = WindowInsets(0, 0, 0, 0), // Full edge-to-edge
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
-            // Header Full menembus Status Bar
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -88,17 +88,14 @@ fun NoteListScreen(
                 )
             }
         }
-        // Tombol FAB dihapus dari sini karena sudah ditangani di AppNavigation
-        // agar tombol Chat (kiri) dan Tambah Note (kanan) bisa sejajar.
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding()) // Menghindari tumpang tindih dengan TopBar
+                .padding(top = paddingValues.calculateTopPadding())
         ) {
             NetworkStatusIndicator()
 
-            // ── Search Bar ────────────────────────────────────────
             OutlinedTextField(
                 value = uiState.searchQuery,
                 onValueChange = { viewModel.onSearchChange(it) },
@@ -108,7 +105,8 @@ fun NoteListScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .testTag("search_bar"),
                 shape = RoundedCornerShape(16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = matcha,
@@ -121,9 +119,8 @@ fun NoteListScreen(
                 singleLine = true
             )
 
-            // ── UI States ─────────────────────────────────────────
             if (uiState.isLoading) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Box(modifier = Modifier.fillMaxSize().testTag("loading_indicator"), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = strawberry)
                 }
             } else if (filteredNotes.isEmpty()) {
@@ -132,7 +129,7 @@ fun NoteListScreen(
                 LazyColumn(
                     contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 100.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize().testTag("notes_list")
                 ) {
                     items(filteredNotes, key = { it.id }) { note ->
                         NoteCard(
@@ -150,7 +147,7 @@ fun NoteListScreen(
 
 @Composable
 fun EmptyNotesState(isDark: Boolean) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(modifier = Modifier.fillMaxSize().testTag("empty_state"), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = "🍵", fontSize = 48.sp)
             Spacer(modifier = Modifier.height(12.dp))
@@ -168,7 +165,7 @@ fun EmptyNotesState(isDark: Boolean) {
 fun NoteCard(note: Note, isDark: Boolean, onClick: () -> Unit, onFavorite: () -> Unit) {
     val cardColor = if (isDark) darkCard else warmWhite
     Card(
-        modifier = Modifier.fillMaxWidth().clickable { onClick() },
+        modifier = Modifier.fillMaxWidth().clickable { onClick() }.testTag("note_item_${note.id}"),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = cardColor),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -188,7 +185,7 @@ fun NoteCard(note: Note, isDark: Boolean, onClick: () -> Unit, onFavorite: () ->
                 Text(text = note.content, fontSize = 13.sp, color = if (isDark) darkSubtext else Color(0xFF888888), maxLines = 2, overflow = TextOverflow.Ellipsis)
             }
 
-            IconButton(onClick = onFavorite) {
+            IconButton(onClick = onFavorite, modifier = Modifier.testTag("favorite_button_${note.id}")) {
                 Icon(
                     imageVector = if (note.isFavorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
                     contentDescription = null,

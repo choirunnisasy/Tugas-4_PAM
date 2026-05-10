@@ -21,7 +21,6 @@ if (localPropertiesFile.exists()) {
 val geminiApiKey: String = localProperties.getProperty("GEMINI_API_KEY")?.trim() ?: ""
 
 buildConfig {
-    // Pastikan package name sama dengan yang di-import di AIRepository.kt
     packageName("id.ac.itera.choirunnisasy.myprofile")
     buildConfigField("GEMINI_API_KEY", geminiApiKey)
 }
@@ -42,13 +41,17 @@ kotlin {
         }
     }
     
-    listOf(
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
-            baseName = "ComposeApp"
-            isStatic = true
+    // Hanya aktifkan iOS jika di Mac. Ini memperbaiki error "Could not resolve" di Windows.
+    val isMac = System.getProperty("os.name").contains("Mac", ignoreCase = true)
+    if (isMac) {
+        listOf(
+            iosArm64(),
+            iosSimulatorArm64()
+        ).forEach { iosTarget ->
+            iosTarget.binaries.framework {
+                baseName = "ComposeApp"
+                isStatic = true
+            }
         }
     }
     
@@ -63,6 +66,7 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.moko.permissions)
         }
+
         commonMain.dependencies {
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
@@ -89,13 +93,27 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
-            // moko-permissions dihapus dari common agar build Desktop (JVM) tidak error
         }
-        iosMain.dependencies {
-            implementation(libs.sqldelight.native)
-            implementation("io.ktor:ktor-client-darwin:2.3.9")
-            implementation(libs.moko.permissions)
+        
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+            implementation(libs.mockk)
+            implementation(libs.turbine)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.koin.test)
         }
+
+        // Kondisional iOS dependencies
+        if (isMac) {
+            val iosMain by getting {
+                dependencies {
+                    implementation(libs.sqldelight.native)
+                    implementation("io.ktor:ktor-client-darwin:2.3.9")
+                    implementation(libs.moko.permissions)
+                }
+            }
+        }
+
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
@@ -107,14 +125,15 @@ kotlin {
 
 android {
     namespace = "id.ac.itera.choirunnisasy.myprofile"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "id.ac.itera.choirunnisasy.myprofile"
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
+        minSdk = 24
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     packaging {
         resources {
@@ -134,4 +153,5 @@ android {
 
 dependencies {
     debugImplementation(libs.compose.ui.tooling)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

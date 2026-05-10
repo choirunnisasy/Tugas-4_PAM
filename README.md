@@ -1,75 +1,46 @@
 # Notes App — Integrasi Smart AI Chatbot (Gemini API)
 
-**IF25-22017 Pengembangan Aplikasi Mobile**
-Program Studi Teknik Informatika · Institut Teknologi Sumatera
+### 📖 Deskripsi Tugas
+Proyek ini adalah pengembangan aplikasi catatan (Notes App) yang mengintegrasikan Google Gemini AI untuk membantu pengguna dalam mengelola catatan secara cerdas. Fokus pengumpulan minggu ini adalah penerapan pengujian perangkat lunak mencakup Unit Testing pada Repository dan ViewModel, serta UI Testing menggunakan Compose Test Rule untuk memastikan aplikasi bebas dari bug dan memiliki coverage kode yang baik.
 
-### Identitas Mahasiswa
+### 📝 Identitas Mahasiswa
 - **Nama**: Choirunnisa Syawaldina
 - **NIM**: 123140136
-- **Mata Kuliah**: Pengembangan Aplikasi Mobile RB
+- **Kelas**: Pengembangan Aplikasi Mobile RB
 
 ---
 
-### Deskripsi Proyek
-Proyek ini adalah pengembangan tingkat lanjut dari Notes App yang mengintegrasikan fitur **Smart Chatbot/Assistant** menggunakan **Google Gemini API** (`gemini-2.0-flash`). Aplikasi ini dibangun dengan KMP (Kotlin Multiplatform), mengimplementasikan arsitektur Clean Code, Dependency Injection (Koin), dan fitur-fitur spesifik platform (Network/Device Info).
+### ✅ Daftar Test Cases
+Berikut adalah daftar **12 test cases** yang telah diuji dan dinyatakan **Passed**:
 
-Fitur Chatbot dirancang dengan tema visual **Matcha x Strawberry** yang ceria dan interaktif, memberikan pengalaman asisten virtual yang personal bagi pengguna.
-
----
-
-### ✨ Fitur yang Diimplementasikan
-
-#### 🤖 Smart AI Assistant (Gemini 2.0 Flash)
-- [x] **Integrasi Gemini API**: Menggunakan Ktor Client untuk streaming content generation.
-- [x] **Multi-turn Conversation (Bonus ⭐)**: Mempertahankan konteks obrolan (chat history) sehingga asisten dapat menjawab secara berkesinambungan.
-- [x] **Streaming Response (Bonus ⭐)**: Efek teks yang muncul secara bertahap (real-time) memberikan kesan interaktif.
-- [x] **Image Analysis (Bonus ⭐)**: Infrastruktur siap untuk menerima input gambar melalui Gemini Vision.
-- [x] **Resilient Error Handling**: Implementasi *sealed class* `AIError` dan logika *retry with exponential backoff*.
-- [x] **Matcha x Strawberry UI**: Desain chat bubble khusus dengan animasi *typing indicator* (3 dots animation).
-
-#### 📱 Platform-Specific Features (Minggu 8)
-- [x] **Koin Dependency Injection**: DI global untuk ViewModel, Repository, dan Service.
-- [x] **Network & Device Monitor**: Deteksi status koneksi internet dan info perangkat secara native.
-- [x] **Battery Info**: Menampilkan persentase dan status pengisian baterai.
-- [x] **Runtime Permissions**: Pengelolaan izin kamera/lokasi secara native.
+| Komponen | Skenario Pengujian | Jumlah | Status |
+| :--- | :--- | :---: | :---: |
+| **Repository** | Pengujian database local (Insert, Delete, Get by ID, Toggle Favorite) | 5 | ✅ Passed |
+| **ViewModel** | Pengujian logika bisnis, StateFlow, dan interaksi dengan Repository | 4 | ✅ Passed |
+| **UI (Instrumented)**| Pengujian komponen UI Compose, Input Fields, dan List Rendering | 3 | ✅ Passed |
+| **Total Passed** | | **12** | |
 
 ---
 
-### 🏛️ Architecture Update (AI Integration)
-```text
-┌─────────────────────────────┐      ┌──────────────────────────┐
-│       ChatViewModel         │◄─────┤      AIRepository        │
-│ (StateFlow & UI Management) │      │ (Logic & History Mgmt)   │
-└──────────────┬──────────────┘      └────────────┬─────────────┘
-               │                                  │
-               ▼                                  ▼
-┌─────────────────────────────┐      ┌──────────────────────────┐
-│         ChatScreen          │      │      GeminiService       │
-│ (Matcha x Strawberry Theme) │      │ (Ktor API & SSE Stream)  │
-└─────────────────────────────┘      └──────────────────────────┘
-```
+### 📊 Screenshot Test Coverage
+Berikut adalah bukti persentase kode yang ter-cover oleh pengujian:
+
+![Test Coverage](screenshots/test_coverage.png)
+*(Catatan: Jika coverage tidak muncul, pastikan Anda menjalankan 'Run with Coverage' pada target Android)*
 
 ---
 
-### 🛠️ Cara Konfigurasi API Key
-Agar fitur AI dapat berjalan, Anda perlu menambahkan API Key Google Gemini ke dalam file `local.properties`:
-```properties
-GEMINI_API_KEY=YOUR_GEMINI_API_KEY
-```
-*Catatan: API Key dikelola melalui BuildConfig agar aman dan tidak ter-commit ke Git.*
+### 🎥 Link Video Demo (45 Detik)
+Video ini mendemonstrasikan fitur utama aplikasi termasuk integrasi Gemini AI dan hasil pengujian.
+
+🔗 **[Tonton Video Demo (45 Detik)](https://drive.google.com/file/d/1ApIUR_kP36NE5QXqZvFiPtDuSsdMidxM/view?usp=sharing)**
 
 ---
 
-## 🎥 Video Demonstrasi
-Video demonstrasi memperlihatkan fitur Chatbot yang merespon secara streaming dan kemampuan mengingat konteks chat.
-
-🔗 **[Tonton Video Demo Fitur AI](https://drive.google.com/file/d/1ApIUR_kP36NE5QXqZvFiPtDuSsdMidxM/view?usp=sharing)**
-
----
-##  Screenshots Layar
-
-| AI Chatbot (Streaming) | 
-|:---:|
-| ![Chat Screen](screenshots/Screenshot_20260504_223454.png) | 
+### ✨ Fitur yang Diimplementasikan (Summary)
+- **Smart AI Assistant**: Streaming response & multi-turn conversation dengan Gemini API.
+- **Notes Management**: CRUD catatan dengan database lokal menggunakan SQLDelight.
+- **Platform Specific**: Deteksi status baterai dan koneksi jaringan.
+- **Clean Architecture**: Implementasi Dependency Injection dengan Koin.
 
 *Dibuat dengan 🍵 & 🍓 · ITERA 2025*

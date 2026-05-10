@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -79,7 +80,8 @@ fun AddNoteScreen(
                                 onBack()
                             }
                         },
-                        enabled = title.isNotBlank()
+                        enabled = title.isNotBlank(),
+                        modifier = Modifier.testTag("save_button_top")
                     ) {
                         Text(
                             text = "Simpan",
@@ -135,7 +137,7 @@ fun AddNoteScreen(
                         value = title,
                         onValueChange = { title = it },
                         placeholder = { Text("Judul catatan...", color = Color(0xFFAAAAAA)) },
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().testTag("title_field"),
                         singleLine = true,
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
@@ -163,7 +165,7 @@ fun AddNoteScreen(
                         value = content,
                         onValueChange = { content = it },
                         placeholder = { Text("Tulis catatan kamu di sini...", color = Color(0xFFAAAAAA)) },
-                        modifier = Modifier.fillMaxWidth().heightIn(min = 150.dp),
+                        modifier = Modifier.fillMaxWidth().heightIn(min = 150.dp).testTag("content_field"),
                         singleLine = false,
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
@@ -190,7 +192,7 @@ fun AddNoteScreen(
                     }
                 },
                 enabled = title.isNotBlank(),
-                modifier = Modifier.fillMaxWidth().height(56.dp),
+                modifier = Modifier.fillMaxWidth().height(56.dp).testTag("save_button"),
                 shape = RoundedCornerShape(18.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = matcha)
             ) {

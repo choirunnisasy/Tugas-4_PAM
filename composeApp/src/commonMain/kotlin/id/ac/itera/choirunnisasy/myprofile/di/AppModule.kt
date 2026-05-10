@@ -1,6 +1,7 @@
 package id.ac.itera.choirunnisasy.myprofile.di
 
 import id.ac.itera.choirunnisasy.myprofile.data.NoteRepository
+import id.ac.itera.choirunnisasy.myprofile.data.NoteRepositoryImpl
 import id.ac.itera.choirunnisasy.myprofile.data.SettingsManager
 import id.ac.itera.choirunnisasy.myprofile.db.NotesDatabase
 import id.ac.itera.choirunnisasy.myprofile.db.DatabaseDriverFactory
@@ -26,10 +27,7 @@ import org.koin.dsl.module
 
 expect val platformModule: Module
 
-val appModule = module {
-    includes(platformModule)
-
-    // SettingsManager membutuhkan ObservableSettings dari platformModule
+val dataModule = module {
     single { SettingsManager(get()) }
     
     single<NotesDatabase> { 
@@ -37,7 +35,7 @@ val appModule = module {
         NotesDatabase(driverFactory.createDriver()) 
     }
     
-    singleOf(::NoteRepository)
+    single<NoteRepository> { NoteRepositoryImpl(get()) }
     singleOf(::PlatformSpecificFetcher)
 
     single {
@@ -62,12 +60,17 @@ val appModule = module {
     }
     
     single { GeminiService(get()) }
-    // Pastikan binding AIRepository benar
     single<AIRepository> { AIRepositoryImpl(get()) }
-    
+}
+
+val viewModelModule = module {
     viewModelOf(::NoteViewModel)
     viewModelOf(::ProfileViewModel)
     viewModelOf(::SettingsViewModel)
     viewModelOf(::NewsViewModel)
     viewModelOf(::ChatViewModel)
+}
+
+val appModule = module {
+    includes(platformModule, dataModule, viewModelModule)
 }
