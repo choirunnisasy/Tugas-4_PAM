@@ -1,4 +1,4 @@
-# Tugas Pertemuan 10: Testing & Dependency Injection
+<img width="1920" height="1200" alt="Screenshot 2026-05-10 211159" src="https://github.com/user-attachments/assets/bfe37a2e-9ed4-4b24-8e2a-911db0ab9827" /># Tugas Pertemuan 10: Testing & Dependency Injection
 
 **Mata Kuliah:** Pengembangan Aplikasi Mobile  
 **Program Studi:** Teknik Informatika - Institut Teknologi Sumatera
@@ -45,7 +45,7 @@ Implementasi arsitektur **Clean Code**, **Koin Dependency Injection (DI)**, dan 
 
 ## Test Coverage Report 
 
-![Test Coverage Screenshot](screenshots/Screenshot_2026-05-10_211159.png)
+![Test Coverage Screenshot](<img width="1920" height="1200" alt="Screenshot 2026-05-10 211159" src="https://github.com/user-attachments/assets/82ecd584-6eae-4657-b6c9-7e90e7c9ba13" />)
 
 ---
 
