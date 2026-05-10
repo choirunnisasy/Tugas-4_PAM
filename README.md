@@ -1,4 +1,4 @@
-<img width="1920" height="1200" alt="Screenshot 2026-05-10 211159" src="https://github.com/user-attachments/assets/bfe37a2e-9ed4-4b24-8e2a-911db0ab9827" /># Tugas Pertemuan 10: Testing & Dependency Injection
+# Tugas Pertemuan 10: Testing & Dependency Injection
 
 **Mata Kuliah:** Pengembangan Aplikasi Mobile  
 **Program Studi:** Teknik Informatika - Institut Teknologi Sumatera
