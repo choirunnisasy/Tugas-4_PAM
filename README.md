@@ -45,8 +45,7 @@ Implementasi arsitektur **Clean Code**, **Koin Dependency Injection (DI)**, dan 
 
 ## Test Coverage Report 
 
-![Test Coverage Screenshot](<img width="1920" height="1200" alt="Screenshot 2026-05-10 211159" src="https://github.com/user-attachments/assets/36c17a91-f7ce-4893-ade5-58c8170ec1fd" />
-)
+![Test Coverage Screenshot](screenshots/Screenshot_2026-05-10_211159.png)
 
 ---
 
